@@ -12,7 +12,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Variants, FireDAC.Comp.Client,
-  FireDAC.Comp.UI;
+  FireDAC.Comp.UI, FireDAC.Stan.Def;
 
 type
   TCLDBConnectionClass = class of TCLDBConnection;
