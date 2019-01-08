@@ -24,8 +24,6 @@ type
     function GetConfigFileName(): string; virtual;
     function GetRegistryRootKey(): string; virtual;
 
-    procedure ReadConfig(const IniFile: TIniFile); virtual;
-
     property ConfigFileName: string read GetConfigFileName;
   public
     constructor Create(Owner: TComponent); override;
@@ -74,11 +72,6 @@ begin
 
 end;
 
-procedure TCLApplication.ReadConfig(const IniFile: TIniFile);
-begin
-
-end;
-
 procedure TCLApplication.ReadConfigFromIniFile;
 var
   IniFile: TIniFile;
@@ -89,8 +82,6 @@ begin
   IniFile := TIniFile.Create(AppPath + '\' + ConfigFileName);
   try
     FOptions.LoadFromIniFile(IniFile);
-//    {чтение дополнительных параметров с ini-файла}
-//    ReadConfig(IniFile);
   finally
     IniFile.Free;
   end;
