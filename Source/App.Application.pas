@@ -77,7 +77,7 @@ var
   IniFile: TIniFile;
 begin
   if not FileExists(AppPath + '\' + ConfigFileName)  then
-    raise Exception.Create('"' + AppPath + '\' + ConfigFileName + '" не найден');
+    raise Exception.Create('Файл "' + AppPath + '\' + ConfigFileName + '" не найден');
 
   IniFile := TIniFile.Create(AppPath + '\' + ConfigFileName);
   try
