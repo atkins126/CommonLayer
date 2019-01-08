@@ -19,6 +19,7 @@ type
   private
     FServer: TStringParam;
     FPort: TIntegerParam;
+    FDatabase: TStringParam;
     FUserName: TStringParam;
     FPassword: TStringParam;
 
@@ -30,6 +31,8 @@ type
     procedure SetPort(const Value: Integer);
     procedure SetServer(const Value: string);
     procedure SetUserName(const Value: string);
+    function GetDatabase: string;
+    procedure SetDatabase(const Value: string);
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy(); override;
@@ -41,6 +44,7 @@ type
 
     property Server: string read GetServer write SetServer;
     property Port: Integer read GetPort write SetPort;
+    property Database: string read GetDatabase write SetDatabase;
     property UserName: string read GetUserName write SetUserName;
     property Password: string read GetPassword write SetPassword;
   end;
@@ -51,7 +55,8 @@ const
   DataBaseGroupName = 'DataBase';
   ServerParamName = 'Server';
   PortParamName = 'Port';
-  UserNameParamName = 'UserName';
+  DataBaseParamName = 'DataBase';
+  UserNameParamName = 'Login';
   PasswordParamName = 'Password';
 
 { TCLDBOptions }
@@ -60,16 +65,18 @@ constructor TCLDBOptions.Create(Owner: TComponent);
 begin
   inherited;
 
-  FServer := TStringParam.Create(DataBaseGroupName, ServerParamName);
-  FPort := TIntegerParam.Create(DataBaseGroupName, PortParamName);
-  FUserName := TStringParam.Create(DataBaseGroupName, UserNameParamName);
-  FPassword := TStringParam.Create(DataBaseGroupName, PasswordParamName);
+  FServer := TStringParam.Create(ServerParamName, DataBaseGroupName);
+  FPort := TIntegerParam.Create(PortParamName, DataBaseGroupName);
+  FDatabase := TStringParam.Create(DataBaseParamName, DataBaseGroupName);
+  FUserName := TStringParam.Create(UserNameParamName, DataBaseGroupName);
+  FPassword := TStringParam.Create(PasswordParamName, DataBaseGroupName);
 end;
 
 destructor TCLDBOptions.Destroy;
 begin
   FServer.Free;
   FPort.Free;
+  FDatabase.Free;
   FUserName.Free;
   FPassword.Free;
 
@@ -116,12 +123,23 @@ begin
   FPassword.Value := Value;
 end;
 
+function TCLDBOptions.GetDatabase: string;
+begin
+  Result := FDatabase.Value;
+end;
+
+procedure TCLDBOptions.SetDatabase(const Value: string);
+begin
+  FDatabase.Value := Value;
+end;
+
 procedure TCLDBOptions.LoadFromIniFile(const IniFile: TIniFile);
 begin
   inherited;
 
   FServer.Load(IniFile);
   FPort.Load(IniFile);
+  FDatabase.Load(IniFile);
   FUserName.Load(IniFile);
   FPassword.Load(IniFile);
 end;
@@ -132,6 +150,7 @@ begin
 
   FServer.Save(IniFile);
   FPort.Save(IniFile);
+  FDatabase.Save(IniFile);
   FUserName.Save(IniFile);
   FPassword.Save(IniFile);
 end;
