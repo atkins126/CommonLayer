@@ -45,6 +45,8 @@ type
     procedure SetPassword(const Value: String);
     function GetConnectionString: String;
     procedure SetConnectionString(const Value: String);
+    function GetConnected: Boolean;
+    procedure SetConnected(const Value: Boolean);
   protected
     FConnection: TFDConnection;
     FTransaction: TFDTransaction;
@@ -52,14 +54,14 @@ type
     FWaitCursor: TFDGUIxWaitCursor;
     FConnectionStatus: TCLConnectionStatus;
 
-    function DoConnect(const Connection: TFDConnection; var ErrorMessage: String): Boolean; virtual; abstract;
+    procedure DoConnect(const Connection: TFDConnection); virtual; abstract;
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy(); override;
 
-    function Connect(const Server, DataBase, UserName, Password: string;
-      var Error: string): Boolean; overload;
-    function Connect(var Error: string): Boolean; overload;
+    procedure Connect(const Server, DataBase, UserName, Password: string); overload;
+    procedure Connect(); overload;
+    procedure Disconnect();
 
     {query}
     function CreateQuery(const Owner: TComponent; const SqlText: String;
@@ -88,7 +90,8 @@ type
 
     function ConnectionStatusToStr(const Value: TCLConnectionStatus): string;
 
-    property Server: String read GetServer write SetServer;
+    property Connected: Boolean read GetConnected write SetConnected;
+    property Server: string read GetServer write SetServer;
     property Database: string read GetDatabase write SetDatabase;
     property UserName: String read GetUserName write SetUserName;
     property Password: String read GetPassword write SetPassword;
@@ -288,26 +291,38 @@ begin
   end;
 end;
 
-function TCLDBConnection.Connect(const Server, DataBase, UserName,
-  Password: string; var Error: string): Boolean;
+function TCLDBConnection.GetConnected: Boolean;
 begin
-  Result := False;
-
-  if FConnection.Connected then
-    Exit(True);
-
-  {устанавливаем настройки подключения к БД}
-  Self.Server:= Server;
-  Self.Database:= DataBase;
-  Self.UserName:= UserName;
-  Self.Password:= Password;
-
-  Result := DoConnect(FConnection, Error);
+  Result := FConnection.Connected;
 end;
 
-function TCLDBConnection.Connect(var Error: String): Boolean;
+procedure TCLDBConnection.SetConnected(const Value: Boolean);
 begin
-  Result := Connect(Server, DataBase, UserName, Password, Error);
+  FConnection.Connected := Value;
+end;
+
+procedure TCLDBConnection.Connect(const Server, DataBase, UserName, Password: string);
+begin
+  if FConnection.Connected then
+    Exit;
+
+  {устанавливаем настройки подключения к БД}
+  Self.Server := Server;
+  Self.Database := DataBase;
+  Self.UserName := UserName;
+  Self.Password := Password;
+
+  DoConnect(FConnection);
+end;
+
+procedure TCLDBConnection.Connect();
+begin
+  Connect(Server, DataBase, UserName, Password);
+end;
+
+procedure TCLDBConnection.Disconnect();
+begin
+  FConnection.Connected := False;
 end;
 
 function TCLDBConnection.CreateQuery(const Owner: TComponent;

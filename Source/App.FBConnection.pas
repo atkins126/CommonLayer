@@ -20,7 +20,7 @@ type
   private
     FFBDriverLink: TFDPhysFBDriverLink;
   protected
-    function DoConnect(const Connection: TFDConnection; var ErrorMessage: String): Boolean; override;
+    procedure DoConnect(const Connection: TFDConnection); override;
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy(); override;
@@ -47,7 +47,7 @@ begin
   inherited;
 end;
 
-function TCLFBConnection.DoConnect(const Connection: TFDConnection; var ErrorMessage: String): Boolean;
+procedure TCLFBConnection.DoConnect(const Connection: TFDConnection);
 const
   DB_CHARACTER_SET = 'UTF8';
 var
@@ -56,37 +56,26 @@ var
   UserName: string;
   Password: string;
 begin
-  Result := False;
-  try
-    Server := Self.Server;
-    Database := Self.Database;
-    UserName := Self.UserName;
-    Password := Self.Password;
+  Server := Self.Server;
+  Database := Self.Database;
+  UserName := Self.UserName;
+  Password := Self.Password;
 
-    FConnectionStatus := cnNone;
-    Connection.Close;
-    Connection.DriverName:= 'FB';
-    Connection.Params.Clear;
-    Connection.Params.Add('DriverID=FB');
-    Self.Server := Server;
-    Self.Database := Database;
-    Self.UserName := UserName;
-    Self.Password := Password;
-    Connection.Params.Add('SQLDialect=3');
-    Connection.Params.Add('Protocol=TCPIP');
-    Connection.Params.Add('CharacterSet=' + DB_CHARACTER_SET);
-    Connection.Params.Add('PageSize=16384');
-    Connection.Params.Add('CreateDatabase=No');
-    Connection.Open();
-
-    Result := Connection.Connected;
-  except
-    on E: Exception do
-    begin
-      Result := False;
-      ErrorMessage := E.Message;
-    end;
-  end;
+  FConnectionStatus := cnNone;
+  Connection.Close;
+  Connection.DriverName:= 'FB';
+  Connection.Params.Clear;
+  Connection.Params.Add('DriverID=FB');
+  Self.Server := Server;
+  Self.Database := Database;
+  Self.UserName := UserName;
+  Self.Password := Password;
+  Connection.Params.Add('SQLDialect=3');
+  Connection.Params.Add('Protocol=TCPIP');
+  Connection.Params.Add('CharacterSet=' + DB_CHARACTER_SET);
+  Connection.Params.Add('PageSize=16384');
+  Connection.Params.Add('CreateDatabase=No');
+  Connection.Open();
 end;
 
 procedure TCLFBConnection.BackupDataBase(const FileName: String);
