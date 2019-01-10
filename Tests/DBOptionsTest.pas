@@ -4,7 +4,8 @@ interface
 
 uses
   TestFramework, System.SysUtils, App.Options, System.Variants, App.DBOptions,
-  TD.DBOptions, App.Params, IniFiles, System.Classes, Vcl.Forms, Math;
+  TD.DBOptions, App.Params, IniFiles, System.Classes, Vcl.Forms, Math,
+  TD.Constants;
 
 type
   TestTDBOptions = class(TTestCase)
@@ -22,13 +23,6 @@ type
   end;
 
 implementation
-
-const
-  Server = 'localhost';
-  Port = 3050;
-  Database = 'd:\Projects\Delphi\CommonLayer\Tests\DB\Cards.fdb';
-  Login = 'sysdba';
-  Password = 'masterkey';
 
 function TestTDBOptions.GetConfigFileName: string;
 const
@@ -64,11 +58,11 @@ begin
   try
     FDBOptions.LoadFromIniFile(IniFile);
 
-    CheckEquals(CompareText(FDBOptions.Server, Server), 0);
-    CheckEquals(FDBOptions.Port, Port);
-    CheckEquals(CompareText(FDBOptions.Database, Database), 0);
-    CheckEquals(CompareText(FDBOptions.UserName, Login), 0);
-    CheckEquals(CompareText(FDBOptions.Password, Password), 0);
+    CheckEquals(CompareText(FDBOptions.Server, DBServer), 0);
+    CheckEquals(FDBOptions.Port, DBPort);
+    CheckEquals(CompareText(FDBOptions.Database, DBDatabase), 0);
+    CheckEquals(CompareText(FDBOptions.UserName, DBLogin), 0);
+    CheckEquals(CompareText(FDBOptions.Password, DBPassword), 0);
   finally
     IniFile.Free;
   end;
