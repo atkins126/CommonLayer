@@ -47,6 +47,7 @@ type
     procedure SetConnectionString(const Value: String);
     function GetConnected: Boolean;
     procedure SetConnected(const Value: Boolean);
+    procedure SetConnectionStatus(const Value: TCLConnectionStatus);
   protected
     FConnection: TFDConnection;
     FTransaction: TFDTransaction;
@@ -134,17 +135,17 @@ end;
 
 procedure TCLDBConnection.BeforeConnect(Sender: TObject);
 begin
-  DoConnectionStatusChange(cnReconnect);
+  SetConnectionStatus(cnReconnect);
 end;
 
 procedure TCLDBConnection.AfterConnect(Sender: TObject);
 begin
-  DoConnectionStatusChange(cnConnect);
+  SetConnectionStatus(cnConnect);
 end;
 
 procedure TCLDBConnection.AfterDisconnect(Sender: TObject);
 begin
-  DoConnectionStatusChange(cnDisconnect);
+  SetConnectionStatus(cnDisconnect);
 end;
 
 procedure TCLDBConnection.SetParamsToQuery(var Query: TFDQuery;
@@ -299,6 +300,12 @@ end;
 procedure TCLDBConnection.SetConnected(const Value: Boolean);
 begin
   FConnection.Connected := Value;
+end;
+
+procedure TCLDBConnection.SetConnectionStatus(const Value: TCLConnectionStatus);
+begin
+  FConnectionStatus := Value;
+  DoConnectionStatusChange(Value);
 end;
 
 procedure TCLDBConnection.Connect(const Server, DataBase, UserName, Password: string);
