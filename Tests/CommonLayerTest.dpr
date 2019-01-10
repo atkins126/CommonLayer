@@ -16,7 +16,6 @@
 
 uses
   DUnitTestRunner,
-  FBConnectionTest in 'FBConnectionTest.pas',
   App.Application in '..\Source\App.Application.pas',
   App.DBApplication in '..\Source\App.DBApplication.pas',
   App.DBConnection in '..\Source\App.DBConnection.pas',
@@ -25,7 +24,10 @@ uses
   App.Options in '..\Source\App.Options.pas',
   App.Params in '..\Source\App.Params.pas',
   TD.DBOptions in 'TestData\TD.DBOptions.pas',
-  DBOptionsTest in 'DBOptionsTest.pas';
+  DBOptionsTest in 'DBOptionsTest.pas',
+  TD.FBConnection in 'TestData\TD.FBConnection.pas',
+  FBConnectionTest in 'FBConnectionTest.pas',
+  TD.Constants in 'TestData\TD.Constants.pas';
 
 {$R *.RES}
 
