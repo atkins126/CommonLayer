@@ -12,7 +12,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Variants, App.DB.Entity, App.DB.DAO,
-  App.DBConnection;
+  App.DB.Connection;
 
 type
   TInformationMessage = procedure(Sender: TObject; Value: String) of object;

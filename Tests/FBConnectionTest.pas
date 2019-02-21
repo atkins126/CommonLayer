@@ -3,8 +3,8 @@
 interface
 
 uses
-  TestFramework, System.SysUtils, App.FBConnection, System.Variants,
-  FireDAC.Phys.IBBase, FireDAC.Phys.FB, IBX.IBServices, App.DBConnection,
+  TestFramework, System.SysUtils, App.FB.Connection, System.Variants,
+  FireDAC.Phys.IBBase, FireDAC.Phys.FB, IBX.IBServices, App.DB.Connection,
   TD.FBConnection, FireDAC.Phys.IBWrapper, System.Classes, FireDAC.Comp.Client,
   TD.Constants;
 

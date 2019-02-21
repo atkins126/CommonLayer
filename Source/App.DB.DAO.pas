@@ -12,7 +12,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Variants, Data.DB, FireDAC.Comp.Client,
-  App.DBConnection, App.DB.Entity , App.DB.MetaData;
+  App.DB.Connection, App.DB.Entity , App.DB.MetaData;
 
 const
   MODIFY_TYPE_INSERT_IDX = 1; {добавление записи}

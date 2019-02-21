@@ -6,13 +6,13 @@
 {                                                       }
 {*******************************************************}
 
-unit App.DBApplication;
+unit App.DB.Application;
 
 interface
 
 uses
   System.Classes, System.SysUtils, System.Variants, Vcl.Forms, IniFiles,
-  App.Application,  App.Options, App.DBOptions, App.DBConnection;
+  App.Application,  App.Options, App.DB.Options, App.DB.Connection;
 
 type
   TCLDBApplication = class(TCLApplication)

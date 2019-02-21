@@ -3,9 +3,9 @@
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Variants,App.DBConnection,
+  System.Classes, System.SysUtils, System.Variants,App.DB.Connection,
   FireDAC.Comp.Client, IBX.IBServices, FireDAC.Phys.IBWrapper, FireDAC.Phys.IBBase,
-  FireDAC.Phys.FB, App.FBConnection;
+  FireDAC.Phys.FB, App.FB.Connection;
 
 type
   TFBConnection = class(TCLFBConnection)

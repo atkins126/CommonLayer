@@ -3,7 +3,7 @@
 interface
 
 uses
-  TestFramework, System.SysUtils, App.Options, System.Variants, App.DBOptions,
+  TestFramework, System.SysUtils, App.Options, System.Variants, App.DB.Options,
   TD.DBOptions, App.Params, IniFiles, System.Classes, Vcl.Forms, Math,
   TD.Constants;
 

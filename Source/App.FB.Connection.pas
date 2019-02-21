@@ -6,12 +6,12 @@
 {                                                       }
 {*******************************************************}
 
-unit App.FBConnection;
+unit App.FB.Connection;
 
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Variants,App.DBConnection,
+  System.Classes, System.SysUtils, System.Variants,App.DB.Connection,
   FireDAC.Comp.Client, IBX.IBServices, FireDAC.Phys.IBWrapper, FireDAC.Phys.IBBase,
   FireDAC.Phys.FB;
 

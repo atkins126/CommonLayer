@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Variants, IniFiles, App.Options,
-  App.Params, App.DBOptions;
+  App.Params, App.DB.Options;
 
 type
   TDBOptions = class(TCLDBOptions)

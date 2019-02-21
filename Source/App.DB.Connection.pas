@@ -6,7 +6,7 @@
 {                                                       }
 {*******************************************************}
 
-unit App.DBConnection;
+unit App.DB.Connection;
 
 interface
 

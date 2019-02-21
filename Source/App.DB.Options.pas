@@ -6,7 +6,7 @@
 {                                                       }
 {*******************************************************}
 
-unit App.DBOptions;
+unit App.DB.Options;
 
 interface
 
