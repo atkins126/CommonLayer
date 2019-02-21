@@ -17,8 +17,9 @@ type
   TCLApplication = class(TComponent)
   private
     FAppPath: String;
-    FOptions: TCLOptions;
   protected
+    FOptions: TCLOptions;
+
     function OptionsClass(): TCLOptionsClass; virtual; abstract;
     function GetApplicationName(): string; virtual;
     function GetConfigFileName(): string; virtual;
@@ -33,7 +34,6 @@ type
 
     property ApplicationName: string read GetApplicationName;
     property AppPath: string read FAppPath;
-    property Options: TCLOptions read FOptions;
     property RegistryRootKey: string read GetRegistryRootKey;
   end;
 

@@ -17,8 +17,9 @@ uses
 type
   TCLDBApplication = class(TCLApplication)
   private
-    FDBConnection: TCLDBConnection;
   protected
+    FDBConnection: TCLDBConnection;
+
     function OptionsClass(): TCLOptionsClass; override;
     function DBConnectionClass(): TCLDBConnectionClass; virtual; abstract;
   public
@@ -50,7 +51,7 @@ end;
 
 procedure TCLDBApplication.LoadSettingsFromDB;
 begin
-  TCLDBOptions(Options).LoadSettingsFromDB();
+  TCLDBOptions(FOptions).LoadSettingsFromDB();
 end;
 
 function TCLDBApplication.OptionsClass: TCLOptionsClass;
