@@ -53,6 +53,8 @@ type
     procedure Remove(const Entity: TEntity); virtual;
     function GetAt(const ID: Integer): TEntity; virtual;
 
+    function GetNewInstance(): TEntity; virtual;
+
     {на запись есть ссылки}
     function RecordUsed(const Entity: TEntity): Boolean; virtual;
 
@@ -154,6 +156,11 @@ begin
 //  finally
 //    Q.Free;
 //  end;
+end;
+
+function TDAOCommon.GetNewInstance(): TEntity;
+begin
+  Result := EntityClass.Create;
 end;
 
 function TDAOCommon.RecordUsed(const Entity: TEntity): Boolean;
