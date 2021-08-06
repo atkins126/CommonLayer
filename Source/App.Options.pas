@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2019 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2021 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -11,7 +11,9 @@ unit App.Options;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Variants, IniFiles;
+  Winapi.Windows, System.Classes, System.SysUtils, System.Variants,
+  {$IFDEF REG_STORAGE}System.Win.Registry{$ELSE}System.IniFiles{$ENDIF},
+  App.Params;
 
 type
   TCLOptionsClass = class of TCLOptions;
@@ -22,10 +24,8 @@ type
     constructor Create(Owner: TComponent); override;
     destructor Destroy(); override;
 
-    procedure LoadFromIniFile(const IniFile: TIniFile); virtual;
-    procedure SaveToIniFile(const IniFile: TIniFile); virtual;
-
-    procedure LoadFromRegistry(); virtual;
+    procedure Load(const Context: {$IFDEF REG_STORAGE}TRegistry{$ELSE}TIniFile{$ENDIF}); virtual;
+    procedure Save(const Context: {$IFDEF REG_STORAGE}TRegistry{$ELSE}TIniFile{$ENDIF}); virtual;
   end;
 
 implementation
@@ -44,17 +44,12 @@ begin
   inherited;
 end;
 
-procedure TCLOptions.LoadFromIniFile(const IniFile: TIniFile);
+procedure TCLOptions.Load(const Context: {$IFDEF REG_STORAGE}TRegistry{$ELSE}TIniFile{$ENDIF});
 begin
 
 end;
 
-procedure TCLOptions.SaveToIniFile(const IniFile: TIniFile);
-begin
-
-end;
-
-procedure TCLOptions.LoadFromRegistry;
+procedure TCLOptions.Save(const Context: {$IFDEF REG_STORAGE}TRegistry{$ELSE}TIniFile{$ENDIF});
 begin
 
 end;

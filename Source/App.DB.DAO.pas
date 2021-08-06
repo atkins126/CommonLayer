@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2019 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2021 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -11,8 +11,9 @@ unit App.DB.DAO;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Variants, Data.DB, FireDAC.Comp.Client,
-  App.DB.Connection, App.DB.Entity , App.DB.MetaData;
+  System.Classes, System.SysUtils, System.Variants, Data.DB,  App.DB.Connection,
+  App.DB.Entity , App.DB.MetaData,
+  {$I DB_Links.inc};
 
 const
   MODIFY_TYPE_INSERT_IDX = 1; {добавление записи}
@@ -53,7 +54,7 @@ type
     procedure Remove(const Entity: TEntity); virtual;
     function GetAt(const ID: Integer): TEntity; virtual;
 
-    function GetNewInstance(): TEntity; virtual;
+    function GetNewInstance(): TEntity; virtual; //CreateInstance
 
     {на запись есть ссылки}
     function RecordUsed(const Entity: TEntity): Boolean; virtual;
@@ -102,10 +103,10 @@ begin
 end;
 
 procedure TDAOCommon.Insert(const Entity: TEntity);
-var
-  Q: TFDQuery;
-  SqlText: String;
-  KeyFields: String;
+//var
+//  Q: TDBQuery;
+//  SqlText: string;
+//  KeyFields: string;
 begin
 //  KeyFields := FEntityInfo.GetKeyFieldList;
 //  SqlText := Format('INSERT INTO %s (%s) VALUES (%s) RETURNING %s',
@@ -138,24 +139,24 @@ end;
 
 function TDAOCommon.GetAt(const ID: Integer): TEntity;
 var
-  Q: TFDQuery;
-  SqlText: String;
+  Q: TDBQuery;
+  SqlText: string;
 begin
-//  Result := nil;
-//
-//  SqlText := Format('SELECT %s FROM %s WHERE ID = :EntityID',
-//                    [FEntityInfo.GetAllFieldList(''), FEntityInfo.EntityName]);
-//
-//  Q := dmConnection.CreateParamQuery(SqlText, ['EntityID'], [ID]);
-//  try
-//    if Q.Eof then
-//      raise Exception.Create('«апись [' + EntityClass.ClassName + '] #' + IntToStr(ID) + ' не найдена');;
-//
-//    Result := EntityClass.Create;
-//    FEntityInfo.SetValues(Result, Q);
-//  finally
-//    Q.Free;
-//  end;
+  Result := nil;
+
+  SqlText := Format('SELECT %s FROM %s WHERE ID = :EntityID',
+                    [FMetaData.GetAllFieldList(''), FMetaData.EntityName]);
+
+  Q := FConnection.CreateParamQuery(SqlText, ['EntityID'], [ID]);
+  try
+    if Q.Eof then
+      raise Exception.Create('«апись [' + EntityClass.ClassName + '] #' + IntToStr(ID) + ' не найдена');;
+
+    Result := EntityClass.Create;
+    FMetaData.SetValues(Result, Q);
+  finally
+    Q.Free;
+  end;
 end;
 
 function TDAOCommon.GetNewInstance(): TEntity;

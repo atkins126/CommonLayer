@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2019 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2021 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -15,23 +15,23 @@ uses
   App.DB.Connection;
 
 type
-  TInformationMessage = procedure(Sender: TObject; Value: String) of object;
-  TConfirmationMessage = procedure(Sender: TObject; Value: String; var Accept: Boolean) of object;
-  TErrorMessage = procedure(Sender: TObject; Value: String) of object;
+  TInformationMessage = procedure(Sender: TObject; Value: string) of object;
+  TConfirmationMessage = procedure(Sender: TObject; Value: string; var Accept: Boolean) of object;
+  TErrorMessage = procedure(Sender: TObject; Value: string) of object;
 
   TServiceCommon = class(TObject)
   private
-    FConnection: TCLDBConnection;
   protected
+    FConnection: TCLDBConnection;
     FDAO: TDAOCommon;
 
     function GetDAOClass(): TDAOClass; virtual; abstract;
 
     {сообщение кот. выводится при удалении записи}
-    function GetDeleteMessage(const Entity: TEntity): String; virtual;
+    function GetDeleteMessage(const Entity: TEntity): string; virtual;
 
     {проверка, можно удалять запись}
-    function CanDelete(const Entity: TEntity; var vMessage: String): Boolean; virtual;
+    function CanDelete(const Entity: TEntity; var vMessage: string): Boolean; virtual;
   public
     constructor Create(const Connection: TCLDBConnection);
     destructor Destroy; override;
@@ -43,17 +43,18 @@ type
     {удалить запись}
     {VerifyCanRemove = True - необходимо выполнить проверку возможности удалять запись}
     {WithConfirm = True - запрос подтверждения на удаление записи}
-    function Remove(const Entity: TEntity;
-      const VerifyCanRemove, WithConfirm: Boolean): Boolean; virtual;
+    function Remove(const Entity: TEntity; const VerifyCanRemove, WithConfirm: Boolean): Boolean; virtual;
 
     {получение записи по ключевому полю}
     function GetAt(const ID: Integer): TEntity; virtual;
+
+    {получение нового объекта}
+    function GetNewInstance(): TEntity; virtual;
 
     procedure StartTransaction;
     procedure CommitTransaction;
     procedure RollbackTransaction;
   end;
-
 
 implementation
 
@@ -77,12 +78,12 @@ begin
   inherited;
 end;
 
-function TServiceCommon.GetDeleteMessage(const Entity: TEntity): String;
+function TServiceCommon.GetDeleteMessage(const Entity: TEntity): string;
 begin
   Result := '';
 end;
 
-function TServiceCommon.CanDelete(const Entity: TEntity; var vMessage: String): Boolean;
+function TServiceCommon.CanDelete(const Entity: TEntity; var vMessage: string): Boolean;
 begin
   vMessage := '';
   Result := not FDAO.RecordUsed(Entity);
@@ -122,13 +123,11 @@ begin
   end;
 end;
 
-function TServiceCommon.Remove(const Entity: TEntity;
-  const VerifyCanRemove, WithConfirm: Boolean): Boolean;
+function TServiceCommon.Remove(const Entity: TEntity; const VerifyCanRemove, WithConfirm: Boolean): Boolean;
 var
-  Caption: String;
+  Caption: string;
 begin
-  if (not VerifyCanRemove) or CanDelete(Entity, Caption) then
-  begin
+  if (not VerifyCanRemove) or CanDelete(Entity, Caption) then begin
     {получение сообщение кот. выводится при удалении записи}
     Caption := GetDeleteMessage(Entity);
 
@@ -140,7 +139,7 @@ begin
 //    if WithConfirm then
 //      Result:= Confirm(Caption)
 //    else
-      Result := True;
+    Result := True;
 
     if Result then
       FDAO.Remove(Entity);
@@ -152,6 +151,11 @@ end;
 function TServiceCommon.GetAt(const ID: Integer): TEntity;
 begin
   Result := FDAO.GetAt(ID);
+end;
+
+function TServiceCommon.GetNewInstance(): TEntity;
+begin
+  Result := FDAO.GetNewInstance;
 end;
 
 procedure TServiceCommon.StartTransaction;

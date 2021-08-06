@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2019 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2021 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -11,18 +11,16 @@ unit App.DB.MetaData;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Variants, Data.DB,
-  Generics.Collections, System.TypInfo, System.RTTI,
-  FireDAC.Stan.Param, App.DB.Columns, App.DB.Entity;
+  System.Classes, System.SysUtils, System.Variants, Data.DB, Generics.Collections,
+  System.TypInfo, System.RTTI, App.DB.Columns, App.DB.Entity;
 
 type
-  TStringArray = array of String;
-
+  TStringArray = array of string;
 
   TMetaData = class
   private
     FEntityClass: TEntityClass;
-    FEntityName: String;
+    FEntityName: string;
     FFields: THFields;
   protected
     procedure Load(); virtual;
@@ -30,19 +28,19 @@ type
     constructor Create(const EntityClass: TEntityClass); virtual;
     destructor Destroy(); override;
 
-    function GetFieldList(const Prefix: String): String; overload;
-    function GetFieldList(): String; overload;
-    function GetKeyFieldList(const Prefix: String): String; overload;
-    function GetKeyFieldList(): String; overload;
-    function GetAllFieldList(const Prefix: String): String; overload;
-    function GetAllFieldList(): String; overload;
+    function GetFieldList(const Prefix: string): string; overload;
+    function GetFieldList: string; overload;
+    function GetKeyFieldList(const Prefix: string): string; overload;
+    function GetKeyFieldList: string; overload;
+    function GetAllFieldList(const Prefix: string): string; overload;
+    function GetAllFieldList: string; overload;
 
     procedure SetValues(Entity: TPersistent; DataSet: TDataSet); overload;
-    procedure SetValues(Entity: TPersistent; const Names: String; DataSet: TDataSet); overload;
-    procedure SetParamValues(Entity: TPersistent; Params: TFDParams);
+    procedure SetValues(Entity: TPersistent; const Names: string; DataSet: TDataSet); overload;
+    procedure SetParamValues(Entity: TPersistent; Params: TParams);
 //    function GetFieldValues():
 
-    property EntityName: String read FEntityName;
+    property EntityName: string read FEntityName;
 //    property FieldsCount: Integer read GetFieldsCount;
   end;
 
@@ -115,32 +113,32 @@ begin
   end;
 end;
 
-function TMetaData.GetFieldList(const Prefix: String): String;
+function TMetaData.GetFieldList(const Prefix: string): string;
 begin
   Result := FFields.GetFieldNames(Prefix);
 end;
 
-function TMetaData.GetFieldList(): String;
+function TMetaData.GetFieldList: string;
 begin
   Result := GetFieldList('');
 end;
 
-function TMetaData.GetKeyFieldList(const Prefix: String): String;
+function TMetaData.GetKeyFieldList(const Prefix: string): string;
 begin
   Result := FFields.GetKeyFieldNames(Prefix);
 end;
 
-function TMetaData.GetKeyFieldList(): String;
+function TMetaData.GetKeyFieldList: string;
 begin
   Result := GetKeyFieldList('');
 end;
 
-function TMetaData.GetAllFieldList(const Prefix: String): String;
+function TMetaData.GetAllFieldList(const Prefix: string): string;
 begin
   Result := FFields.GetAllFieldNames(Prefix);
 end;
 
-function TMetaData.GetAllFieldList(): String;
+function TMetaData.GetAllFieldList: string;
 begin
   Result := GetAllFieldList('');
 end;
@@ -150,14 +148,13 @@ var
   i: Integer;
   Item: THField;
 begin
-  for i := 0 to FFields.Count - 1 do
-  begin
+  for i := 0 to FFields.Count - 1 do begin
     Item := FFields.Items[i];
     SetPropValue(Entity, Item.PropertyName, DataSet.FieldByName(Item.FieldName).Value);
   end;
 end;
 
-procedure TMetaData.SetValues(Entity: TPersistent; const Names: String;
+procedure TMetaData.SetValues(Entity: TPersistent; const Names: string;
   DataSet: TDataSet);
 var
   i: Integer;
@@ -168,8 +165,7 @@ begin
   try
     Items.CommaText := Names;
 
-    for i := 0  to Items.Count - 1 do
-    begin
+    for i := 0  to Items.Count - 1 do begin
       Field := FFields.GetItem(Items[i]);
       SetPropValue(Entity, Field.PropertyName, DataSet.FieldByName(Field.FieldName).Value);
     end;
@@ -178,15 +174,14 @@ begin
   end;
 end;
 
-procedure TMetaData.SetParamValues(Entity: TPersistent; Params: TFDParams);
+procedure TMetaData.SetParamValues(Entity: TPersistent; Params: TParams);
 var
   i: Integer;
-  Param: TFDParam;
+  Param: TParam;
   Field: THField;
   Value: Variant;
 begin
-  for i := 0 to Params.Count - 1 do
-  begin
+  for i := 0 to Params.Count - 1 do begin
     Param := Params[i];
 
     Field := FFields.GetItem(Param.Name);

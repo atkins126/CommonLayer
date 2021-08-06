@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2019 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2021 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -19,15 +19,15 @@ type
 
   THField = class(TPersistent)
   private
-    FFieldName: String;
-    FPropertyName: String;
+    FFieldName: string;
+    FPropertyName: string;
     FFieldType: THFieldType;
   public
-    constructor Create(const PropertyName, FieldName: String; const FieldType: THFieldType); overload;
-    constructor Create(const PropertyName, FieldName: String); overload;
+    constructor Create(const PropertyName, FieldName: string; const FieldType: THFieldType); overload;
+    constructor Create(const PropertyName, FieldName: string); overload;
 
-    property FieldName: String read FFieldName write FFieldName;
-    property PropertyName: String read FPropertyName write FPropertyName;
+    property FieldName: string read FFieldName write FFieldName;
+    property PropertyName: string read FPropertyName write FPropertyName;
     property FieldType: THFieldType read FFieldType write FFieldType;
   end;
 
@@ -36,24 +36,24 @@ type
     FItems: TList<THField>;
     FFields: TList<THField>;
     FKeyFields: TList<THField>;
-    FFieldNames: String;
+//    FFieldNames: string;
 
-    function GetInternalFields(const Fields: TList<THField>; const Prefix: String): String;
+    function GetInternalFields(const Fields: TList<THField>; const Prefix: string): string;
   protected
   public
     constructor Create();
     destructor Destroy; override;
 
     function Add(const Field: THField): Integer;
-    function GetItem(const FieldName: String): THField;
-    function Count(): Integer;
-    function FieldsCount(): Integer;
-    function KeyFieldsCount(): Integer;
-    procedure Clear();
+    function GetItem(const FieldName: string): THField;
+    function Count: Integer;
+    function FieldsCount: Integer;
+    function KeyFieldsCount: Integer;
+    procedure Clear;
 
-    function GetFieldNames(const Prefix: String): String;
-    function GetKeyFieldNames(const Prefix: String): String;
-    function GetAllFieldNames(const Prefix: String): String;
+    function GetFieldNames(const Prefix: string): string;
+    function GetKeyFieldNames(const Prefix: string): string;
+    function GetAllFieldNames(const Prefix: string): string;
 
     property Items: TList<THField> read FItems;
     property Fields: TList<THField> read FFields;
@@ -64,8 +64,7 @@ implementation
 
 { THField }
 
-constructor THField.Create(const PropertyName, FieldName: String;
-  const FieldType: THFieldType);
+constructor THField.Create(const PropertyName, FieldName: string; const FieldType: THFieldType);
 begin
   inherited Create();
 
@@ -74,7 +73,7 @@ begin
   FFieldType := FieldType;
 end;
 
-constructor THField.Create(const PropertyName, FieldName: String);
+constructor THField.Create(const PropertyName, FieldName: string);
 begin
   Create(PropertyName, FieldName, htField);
 end;
@@ -98,14 +97,12 @@ begin
   inherited;
 end;
 
-function THFields.GetInternalFields(const Fields: TList<THField>;
-  const Prefix: String): String;
+function THFields.GetInternalFields(const Fields: TList<THField>; const Prefix: string): string;
 var
   Item: THField;
 begin
   Result := '';
-  for Item in Fields do
-  begin
+  for Item in Fields do begin
     if Result <> '' then
       Result := Result + ', ';
 
@@ -123,7 +120,7 @@ begin
     FFields.Add(Field);
 end;
 
-function THFields.GetItem(const FieldName: String): THField;
+function THFields.GetItem(const FieldName: string): THField;
 var
   Item: THField;
 begin
@@ -162,17 +159,17 @@ begin
   FItems.Clear;
 end;
 
-function THFields.GetFieldNames(const Prefix: String): String;
+function THFields.GetFieldNames(const Prefix: string): string;
 begin
   Result := GetInternalFields(FFields, Prefix);
 end;
 
-function THFields.GetKeyFieldNames(const Prefix: String): String;
+function THFields.GetKeyFieldNames(const Prefix: string): string;
 begin
   Result := GetInternalFields(FKeyFields, Prefix);
 end;
 
-function THFields.GetAllFieldNames(const Prefix: String): String;
+function THFields.GetAllFieldNames(const Prefix: string): string;
 begin
   Result := GetInternalFields(FItems, Prefix);
 end;

@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2019 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2021 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -16,20 +16,20 @@ uses
 type
   TEntityAttribute = class(TCustomAttribute)
   private
-    FName: String;
+    FName: string;
   public
-    constructor Create(const Name: String);
+    constructor Create(const Name: string);
 
-    property Name: String read FName write FName;
+    property Name: string read FName write FName;
   end;
 
   TColumnAttribute = class(TCustomAttribute)
   private
-    FName: String;
+    FName: string;
   public
-    constructor Create(const Name: String);
+    constructor Create(const Name: string);
 
-    property Name: String read FName write FName;
+    property Name: string read FName write FName;
   end;
 
   TIDAttribute = class(TCustomAttribute)
@@ -42,11 +42,11 @@ type
     FID: Variant;
   protected
   public
-    constructor Create();
+    constructor Create(); virtual;
     destructor Destroy(); override;
 
-    class function EntityName(): String; virtual; abstract;
-    class function FieldList(): String; virtual; abstract;
+    class function EntityName(): string; virtual; abstract;
+    class function FieldList(): string; virtual; abstract;
   published
     [TIDAttribute]
     [TColumnAttribute('ID')]
@@ -57,7 +57,7 @@ implementation
 
 { TEntityAttribute }
 
-constructor TEntityAttribute.Create(const Name: String);
+constructor TEntityAttribute.Create(const Name: string);
 begin
   inherited Create();
 
@@ -66,9 +66,11 @@ end;
 
 { TColumnAttribute }
 
-constructor TColumnAttribute.Create(const Name: String);
+constructor TColumnAttribute.Create(const Name: string);
 begin
+  inherited Create();
 
+  FName := Name;
 end;
 
 { TEntity }

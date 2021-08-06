@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2019 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2020 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -11,18 +11,13 @@ unit App.DB.Options;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Variants, IniFiles, App.Options,
-  App.Params;
+  System.Classes, System.SysUtils, System.Variants, Winapi.Windows,
+  App.Options, App.Params,
+  {$IFDEF REG_STORAGE}System.Win.Registry{$ELSE}System.IniFiles{$ENDIF};
 
 type
   TCLDBOptions = class(TCLOptions)
   private
-    FServer: TStringParam;
-    FPort: TIntegerParam;
-    FDatabase: TStringParam;
-    FUserName: TStringParam;
-    FPassword: TStringParam;
-
     function GetPassword: string;
     function GetPort: Integer;
     function GetServer: string;
@@ -33,14 +28,29 @@ type
     procedure SetUserName(const Value: string);
     function GetDatabase: string;
     procedure SetDatabase(const Value: string);
+  protected
+  {$IFDEF REG_STORAGE}
+    FServer: TRegStringParam;
+    FPort: TRegIntegerParam;
+    FDatabase: TRegStringParam;
+    FUserName: TRegStringParam;
+    FPassword: TRegStringParam;
+  {$ELSE}
+    FServer: TIniStringParam;
+    FPort: TIniIntegerParam;
+    FDatabase: TIniStringParam;
+    FUserName: TIniStringParam;
+    FPassword: TIniStringParam;
+  {$ENDIF}
+
+    function GetDatabaseGroupName: string; virtual;
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy(); override;
 
-    procedure LoadFromIniFile(const IniFile: TIniFile); override;
-    procedure SaveToIniFile(const IniFile: TIniFile); override;
-
-    procedure LoadSettingsFromDB(); virtual;
+    procedure Load(const Context: {$IFDEF REG_STORAGE}TRegistry{$ELSE}TIniFile{$ENDIF}); override;
+    procedure Save(const Context: {$IFDEF REG_STORAGE}TRegistry{$ELSE}TIniFile{$ENDIF}); override;
+    procedure LoadSettingsFromDB; virtual;
 
     property Server: string read GetServer write SetServer;
     property Port: Integer read GetPort write SetPort;
@@ -52,10 +62,9 @@ type
 implementation
 
 const
-  DataBaseGroupName = 'DataBase';
   ServerParamName = 'Server';
   PortParamName = 'Port';
-  DataBaseParamName = 'DataBase';
+  DataBaseParamName = 'Database';
   UserNameParamName = 'Login';
   PasswordParamName = 'Password';
 
@@ -65,11 +74,19 @@ constructor TCLDBOptions.Create(Owner: TComponent);
 begin
   inherited;
 
-  FServer := TStringParam.Create(ServerParamName, DataBaseGroupName);
-  FPort := TIntegerParam.Create(PortParamName, DataBaseGroupName);
-  FDatabase := TStringParam.Create(DataBaseParamName, DataBaseGroupName);
-  FUserName := TStringParam.Create(UserNameParamName, DataBaseGroupName);
-  FPassword := TStringParam.Create(PasswordParamName, DataBaseGroupName);
+{$IFDEF REG_STORAGE}
+  FServer := TRegStringParam.Create(ServerParamName, GetDatabaseGroupName);
+  FPort := TRegIntegerParam.Create(PortParamName, GetDatabaseGroupName);
+  FDatabase := TRegStringParam.Create(DataBaseParamName, GetDatabaseGroupName);
+  FUserName := TRegStringParam.Create(UserNameParamName, GetDatabaseGroupName);
+  FPassword := TRegStringParam.Create(PasswordParamName, GetDatabaseGroupName);
+{$ELSE}
+  FServer := TIniStringParam.Create(ServerParamName, GetDatabaseGroupName);
+  FPort := TIniIntegerParam.Create(PortParamName, GetDatabaseGroupName);
+  FDatabase := TIniStringParam.Create(DataBaseParamName, GetDatabaseGroupName);
+  FUserName := TIniStringParam.Create(UserNameParamName, GetDatabaseGroupName);
+  FPassword := TIniStringParam.Create(PasswordParamName, GetDatabaseGroupName);
+{$ENDIF}
 end;
 
 destructor TCLDBOptions.Destroy;
@@ -133,29 +150,38 @@ begin
   FDatabase.Value := Value;
 end;
 
-procedure TCLDBOptions.LoadFromIniFile(const IniFile: TIniFile);
+function TCLDBOptions.GetDatabaseGroupName: string;
 begin
-  inherited;
-
-  FServer.Load(IniFile);
-  FPort.Load(IniFile);
-  FDatabase.Load(IniFile);
-  FUserName.Load(IniFile);
-  FPassword.Load(IniFile);
+  Result := 'Connection';
 end;
 
-procedure TCLDBOptions.SaveToIniFile(const IniFile: TIniFile);
+procedure TCLDBOptions.Load(const Context: {$IFDEF REG_STORAGE}TRegistry{$ELSE}TIniFile{$ENDIF});
 begin
-  inherited;
-
-  FServer.Save(IniFile);
-  FPort.Save(IniFile);
-  FDatabase.Save(IniFile);
-  FUserName.Save(IniFile);
-  FPassword.Save(IniFile);
+{$IFNDEF CARDS}
+  FServer.Load(Context);
+  FPort.Load(Context);
+  FDatabase.Load(Context);
+  FUserName.Load(Context);
+{$IFDEF EXTDLL}
+  FPassword.Load(Context);
+{$ENDIF}
+{$ENDIF}
 end;
 
-procedure TCLDBOptions.LoadSettingsFromDB();
+procedure TCLDBOptions.Save(const Context: {$IFDEF REG_STORAGE}TRegistry{$ELSE}TIniFile{$ENDIF});
+begin
+{$IFNDEF CARDS}
+  FServer.Save(Context);
+  FPort.Save(Context);
+  FDatabase.Save(Context);
+  FUserName.Save(Context);
+{$IFDEF EXTDLL}
+  FPassword.Save(Context);
+{$ENDIF}
+{$ENDIF}
+end;
+
+procedure TCLDBOptions.LoadSettingsFromDB;
 begin
 
 end;

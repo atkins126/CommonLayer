@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2019 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2021 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -11,12 +11,15 @@ unit App.DB.Application;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Variants, Vcl.Forms, IniFiles,
-  App.Application,  App.Options, App.DB.Options, App.DB.Connection;
+  System.Classes, System.SysUtils, System.Variants, Vcl.Forms,
+  App.Application, App.Options, App.DB.Options, App.DB.Connection;
 
 type
   TCLDBApplication = class(TCLApplication)
   private
+    procedure ConnectionStatusChanged(Sender: TObject; const Status: TCLConnectionStatus);
+    function GetConnected: Boolean;
+    procedure SetConnected(const Value: Boolean);
   protected
     FDBConnection: TCLDBConnection;
 
@@ -27,6 +30,8 @@ type
     destructor Destroy(); override;
 
     procedure LoadSettingsFromDB(); virtual;
+
+    property Connected: Boolean read GetConnected write SetConnected;
   end;
 
 implementation
@@ -38,9 +43,7 @@ begin
   inherited;
 
   FDBConnection := DBConnectionClass.Create(Self);
-
-//  {создание слоя сервисов}
-//  CreateServiceLayer();
+  FDBConnection.OnConnectionStatusChange := ConnectionStatusChanged;
 end;
 
 destructor TCLDBApplication.Destroy;
@@ -49,9 +52,26 @@ begin
   inherited;
 end;
 
+procedure TCLDBApplication.ConnectionStatusChanged(Sender: TObject;
+  const Status: TCLConnectionStatus);
+begin
+  if Status = cnConnect then
+    LoadSettingsFromDB;
+end;
+
+function TCLDBApplication.GetConnected: Boolean;
+begin
+  Result := FDBConnection.Connected;
+end;
+
+procedure TCLDBApplication.SetConnected(const Value: Boolean);
+begin
+  FDBConnection.Connected := Value;
+end;
+
 procedure TCLDBApplication.LoadSettingsFromDB;
 begin
-  TCLDBOptions(FOptions).LoadSettingsFromDB();
+  TCLDBOptions(FOptions).LoadSettingsFromDB;
 end;
 
 function TCLDBApplication.OptionsClass: TCLOptionsClass;

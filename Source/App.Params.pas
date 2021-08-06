@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2019 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2021 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -15,7 +15,7 @@ uses
   Registry, IniFiles;
 
 type
-   TCLParam<T> = class(TPersistent)
+   TCLParam<T,C> = class(TPersistent)
    private
      FValue: T;
      FEmptyValue: T;
@@ -26,75 +26,129 @@ type
      procedure SetValue(const Value: T);
 
      function DefaultEmptyValue(): T; virtual; abstract;
-     function ReadValue(const Registry: TRegistry): T; overload; virtual; abstract;
-     procedure SaveValue(const Registry: TRegistry; const Value: T); overload; virtual; abstract;
-     function ReadValue(const IniFile: TIniFile): T; overload; virtual; abstract;
-     procedure SaveValue(const IniFile: TIniFile; const Value: T); overload; virtual; abstract;
+     function ReadValue(const Context: C): T; virtual; abstract;
+     procedure SaveValue(const Context: C; const Value: T); virtual; abstract;
    public
      constructor Create(const KeyName, KeyPath: string; const EmptyValue: T); overload;
      constructor Create(const KeyName, KeyPath: string); overload;
      destructor Destroy; override;
 
-     function Load(const Registry: TRegistry): T; overload;
-     procedure Save(const Registry: TRegistry; const Value: T); overload;
-     procedure Save(const Registry: TRegistry); overload;
-     function Load(const IniFile: TIniFile): T; overload;
-     procedure Save(const IniFile: TIniFile; const Value: T); overload;
-     procedure Save(const IniFile: TIniFile); overload;
+     function Load(const Context: C): T; virtual; abstract;
+     procedure Save(const Context: C; const Value: T); overload; virtual; abstract;
+     procedure Save(const Context: C); overload; virtual; abstract;
 
      property KeyName: string read FKeyName write FKeyName;
      property KeyPath: string read FKeyPath write FKeyPath;
      property Value: T read GetValue write SetValue;
    end;
 
-   TBooleanParam = class(TCLParam<Boolean>)
+   TRegParam<T> = class(TCLParam<T, TRegistry>)
+   private
+     function GetRegistryPath(): string;
+   public
+     function Load(const Context: TRegistry): T; override;
+     procedure Save(const Context: TRegistry; const Value: T); overload; override;
+     procedure Save(const Context: TRegistry); overload; override;
+   end;
+
+   TIniParam<T> = class(TCLParam<T, TIniFile>)
+   private
+   public
+     function Load(const Context: TIniFile): T; override;
+     procedure Save(const Context: TIniFile; const Value: T); overload; override;
+     procedure Save(const Context: TIniFile); overload; override;
+   end;
+
+   TRegBooleanParam = class(TRegParam<Boolean>)
    protected
      function DefaultEmptyValue(): Boolean; override;
-     function ReadValue(const Registry: TRegistry): Boolean; overload; override;
-     procedure SaveValue(const Registry: TRegistry; const Value: Boolean); overload; override;
-     function ReadValue(const IniFile: TIniFile): Boolean; overload; override;
-     procedure SaveValue(const IniFile: TIniFile; const Value: Boolean); overload; override;
+     function ReadValue(const Context: TRegistry): Boolean; override;
+     procedure SaveValue(const Context: TRegistry; const Value: Boolean); override;
    end;
 
-   TStringParam = class(TCLParam<string>)
+   TIniBooleanParam = class(TIniParam<Boolean>)
+   protected
+     function DefaultEmptyValue(): Boolean; override;
+     function ReadValue(const Context: TIniFile): Boolean; override;
+     procedure SaveValue(const Context: TIniFile; const Value: Boolean); override;
+   end;
+
+   TRegStringParam = class(TRegParam<string>)
    protected
      function DefaultEmptyValue(): string; override;
-     function ReadValue(const Registry: TRegistry): string; overload; override;
-     procedure SaveValue(const Registry: TRegistry; const Value: string); overload; override;
-     function ReadValue(const IniFile: TIniFile): string; overload; override;
-     procedure SaveValue(const IniFile: TIniFile; const Value: string); overload; override;
+     function ReadValue(const Context: TRegistry): string; override;
+     procedure SaveValue(const Context: TRegistry; const Value: string); override;
    end;
 
-   TIntegerParam = class(TCLParam<Integer>)
+   TIniStringParam = class(TIniParam<string>)
+   protected
+     function DefaultEmptyValue(): string; override;
+     function ReadValue(const Context: TIniFile): string; override;
+     procedure SaveValue(const Context: TIniFile; const Value: string); override;
+   end;
+
+   TRegIntegerParam = class(TRegParam<Integer>)
    protected
      function DefaultEmptyValue(): Integer; override;
-     function ReadValue(const Registry: TRegistry): Integer; overload; override;
-     procedure SaveValue(const Registry: TRegistry; const Value: Integer); overload; override;
-     function ReadValue(const IniFile: TIniFile): Integer; overload; override;
-     procedure SaveValue(const IniFile: TIniFile; const Value: Integer); overload; override;
+     function ReadValue(const Context: TRegistry): Integer; override;
+     procedure SaveValue(const Context: TRegistry; const Value: Integer); override;
    end;
 
-   TDoubleParam = class(TCLParam<Double>)
+   TIniIntegerParam = class(TIniParam<Integer>)
+   protected
+     function DefaultEmptyValue(): Integer; override;
+     function ReadValue(const Context: TIniFile): Integer; override;
+     procedure SaveValue(const Context: TIniFile; const Value: Integer); override;
+   end;
+
+   TRegDoubleParam = class(TRegParam<Double>)
    protected
      function DefaultEmptyValue(): Double; override;
-     function ReadValue(const Registry: TRegistry): Double; overload; override;
-     procedure SaveValue(const Registry: TRegistry; const Value: Double); overload; override;
-     function ReadValue(const IniFile: TIniFile): Double; overload; override;
-     procedure SaveValue(const IniFile: TIniFile; const Value: Double); overload; override;
+     function ReadValue(const Context: TRegistry): Double; override;
+     procedure SaveValue(const Context: TRegistry; const Value: Double); override;
    end;
 
-   TDateTimeParam = class(TCLParam<TDateTime>)
+   TIniDoubleParam = class(TIniParam<Double>)
+   protected
+     function DefaultEmptyValue(): Double; override;
+     function ReadValue(const Context: TIniFile): Double; override;
+     procedure SaveValue(const Context: TIniFile; const Value: Double); override;
+   end;
+
+   TRegDateTimeParam = class(TRegParam<TDateTime>)
    protected
      function DefaultEmptyValue(): TDateTime; override;
-     function ReadValue(const Registry: TRegistry): TDateTime; overload; override;
-     procedure SaveValue(const Registry: TRegistry; const Value: TDateTime); overload; override;
-     function ReadValue(const IniFile: TIniFile): TDateTime; overload; override;
-     procedure SaveValue(const IniFile: TIniFile; const Value: TDateTime); overload; override;
+     function ReadValue(const Context: TRegistry): TDateTime; override;
+     procedure SaveValue(const Context: TRegistry; const Value: TDateTime); override;
+   end;
+
+   TIniDateTimeParam = class(TIniParam<TDateTime>)
+   protected
+     function DefaultEmptyValue(): TDateTime; override;
+     function ReadValue(const Context: TIniFile): TDateTime; override;
+     procedure SaveValue(const Context: TIniFile; const Value: TDateTime); override;
+   end;
+
+   TRegTimeParam = class(TRegParam<TTime>)
+   protected
+     function DefaultEmptyValue(): TTime; override;
+     function ReadValue(const Context: TRegistry): TTime; override;
+     procedure SaveValue(const Context: TRegistry; const Value: TTime); override;
+   end;
+
+   TIniTimeParam = class(TIniParam<TTime>)
+   protected
+     function DefaultEmptyValue(): TTime; override;
+     function ReadValue(const Context: TIniFile): TTime; override;
+     procedure SaveValue(const Context: TIniFile; const Value: TTime); override;
    end;
 
 implementation
 
-constructor TCLParam<T>.Create(const KeyName, KeyPath: string; const EmptyValue: T);
+uses
+  App.Constants;
+
+constructor TCLParam<T,C>.Create(const KeyName, KeyPath: string; const EmptyValue: T);
 begin
   inherited Create();
 
@@ -104,215 +158,300 @@ begin
   FValue := EmptyValue;
 end;
 
-constructor TCLParam<T>.Create(const KeyName, KeyPath: string);
+constructor TCLParam<T,C>.Create(const KeyName, KeyPath: string);
 begin
   Create(KeyName, KeyPath, DefaultEmptyValue);
 end;
 
-destructor TCLParam<T>.Destroy;
+destructor TCLParam<T,C>.Destroy;
 begin
 
   inherited;
 end;
 
-function TCLParam<T>.GetValue: T;
+function TCLParam<T,C>.GetValue: T;
 begin
   Result := FValue;
 end;
 
-procedure TCLParam<T>.SetValue(const Value: T);
+procedure TCLParam<T,C>.SetValue(const Value: T);
 begin
   FValue := Value;
 end;
 
-function TCLParam<T>.Load(const Registry: TRegistry): T;
+{ TRegParam<T> }
+
+function TRegParam<T>.GetRegistryPath: string;
 begin
+  if AppName <> '' then
+    Result := 'Software\' + AppName + '\';
+
+  if FKeyPath = '' then
+    Result := Result + 'Settings'
+  else
+    Result := Result + FKeyPath;
+end;
+
+function TRegParam<T>.Load(const Context: TRegistry): T;
+var
+  Key: string;
+begin
+  Key := GetRegistryPath;
+
   Result := FEmptyValue;
   try
-    if not Registry.KeyExists(FKeyPath) then
+    if not Context.KeyExists(Key) then
       Exit;
 
-    Registry.OpenKey(FKeyPath, False);
+    Context.OpenKey(Key, False);
     try
-      if Registry.ValueExists(FKeyName) then
-        Result := ReadValue(Registry);
+      if Context.ValueExists(FKeyName) then
+        Result := ReadValue(Context);
     finally
-      Registry.CloseKey;
+      Context.CloseKey;
     end;
   finally
     FValue := Result;
   end;
 end;
 
-procedure TCLParam<T>.Save(const Registry: TRegistry; const Value: T);
+procedure TRegParam<T>.Save(const Context: TRegistry; const Value: T);
 begin
-  Registry.OpenKey(FKeyPath, True);
+  Context.OpenKey(GetRegistryPath, True);
   try
-    SaveValue(Registry, Value);
+    SaveValue(Context, Value);
     FValue := Value;
   finally
-    Registry.CloseKey;
+    Context.CloseKey;
   end;
 end;
 
-procedure TCLParam<T>.Save(const Registry: TRegistry);
+procedure TRegParam<T>.Save(const Context: TRegistry);
 begin
-  Save(Registry, FValue);
+  Save(Context, FValue);
 end;
 
-function TCLParam<T>.Load(const IniFile: TIniFile): T;
+{ TIniParam<T> }
+
+function TIniParam<T>.Load(const Context: TIniFile): T;
 begin
-  try
-    Result := ReadValue(IniFile);
-  finally
-    FValue := Result;
-  end;
+  Result := ReadValue(Context);
+  FValue := Result;
 end;
 
-procedure TCLParam<T>.Save(const IniFile: TIniFile; const Value: T);
+procedure TIniParam<T>.Save(const Context: TIniFile; const Value: T);
 begin
-  SaveValue(IniFile, Value);
+  SaveValue(Context, Value);
   FValue := Value;
 end;
 
-procedure TCLParam<T>.Save(const IniFile: TIniFile);
+procedure TIniParam<T>.Save(const Context: TIniFile);
 begin
-  Save(IniFile, FValue);
+  Save(Context, FValue);
 end;
 
-{ TBooleanParam }
+{ TRegBooleanParam }
 
-function TBooleanParam.DefaultEmptyValue: Boolean;
+function TRegBooleanParam.DefaultEmptyValue: Boolean;
 begin
   Result := False;
 end;
 
-function TBooleanParam.ReadValue(const Registry: TRegistry): Boolean;
+function TRegBooleanParam.ReadValue(const Context: TRegistry): Boolean;
 begin
-  Result := Registry.ReadBool(FKeyName);
+  Result := Context.ReadBool(FKeyName);
 end;
 
-procedure TBooleanParam.SaveValue(const Registry: TRegistry; const Value: Boolean);
+procedure TRegBooleanParam.SaveValue(const Context: TRegistry; const Value: Boolean);
 begin
-  Registry.WriteBool(FKeyName, Value);
+  Context.WriteBool(FKeyName, Value);
 end;
 
-function TBooleanParam.ReadValue(const IniFile: TIniFile): Boolean;
+{ TIniBooleanParam }
+
+function TIniBooleanParam.DefaultEmptyValue: Boolean;
 begin
-  Result := IniFile.ReadBool(FKeyPath, FKeyName, FEmptyValue);
+  Result := False;
 end;
 
-procedure TBooleanParam.SaveValue(const IniFile: TIniFile; const Value: Boolean);
+function TIniBooleanParam.ReadValue(const Context: TIniFile): Boolean;
 begin
-  IniFile.WriteBool(FKeyPath, FKeyName, Value);
+   Result := Context.ReadBool(FKeyPath, FKeyName, FEmptyValue);
 end;
 
-{ TStringParam }
+procedure TIniBooleanParam.SaveValue(const Context: TIniFile; const Value: Boolean);
+begin
+  Context.WriteBool(FKeyPath, FKeyName, Value);
+end;
 
-function TStringParam.DefaultEmptyValue: string;
+{ TRegStringParam }
+
+function TRegStringParam.DefaultEmptyValue: string;
 begin
   Result := '';
 end;
 
-function TStringParam.ReadValue(const Registry: TRegistry): string;
+function TRegStringParam.ReadValue(const Context: TRegistry): string;
 begin
-  Result := Registry.ReadString(FKeyName);
+  Result := Context.ReadString(FKeyName);
 end;
 
-procedure TStringParam.SaveValue(const Registry: TRegistry; const Value: string);
+procedure TRegStringParam.SaveValue(const Context: TRegistry; const Value: string);
 begin
-  Registry.WriteString(FKeyName, Value);
+  Context.WriteString(FKeyName, Value);
 end;
 
-function TStringParam.ReadValue(const IniFile: TIniFile): string;
+{ TIniStringParam }
+
+function TIniStringParam.DefaultEmptyValue: string;
 begin
-  Result := IniFile.ReadString(FKeyPath, FKeyName, FEmptyValue);
+  Result := '';
 end;
 
-procedure TStringParam.SaveValue(const IniFile: TIniFile; const Value: string);
+function TIniStringParam.ReadValue(const Context: TIniFile): string;
 begin
-  IniFile.WriteString(FKeyPath, FKeyName, Value);
+  Result := Context.ReadString(FKeyPath, FKeyName, FEmptyValue);
 end;
 
-{ TIntegerParam }
+procedure TIniStringParam.SaveValue(const Context: TIniFile; const Value: string);
+begin
+  Context.WriteString(FKeyPath, FKeyName, Value);
+end;
 
-function TIntegerParam.DefaultEmptyValue: Integer;
+{ TRegIntegerParam }
+
+function TRegIntegerParam.DefaultEmptyValue: Integer;
 begin
   Result := 0;
 end;
 
-function TIntegerParam.ReadValue(const Registry: TRegistry): Integer;
+function TRegIntegerParam.ReadValue(const Context: TRegistry): Integer;
 begin
-  Result := Registry.ReadInteger(FKeyName);
+  Result := Context.ReadInteger(FKeyName);
 end;
 
-procedure TIntegerParam.SaveValue(const Registry: TRegistry; const Value: Integer);
+procedure TRegIntegerParam.SaveValue(const Context: TRegistry; const Value: Integer);
 begin
-  Registry.WriteInteger(FKeyName, Value);
+  Context.WriteInteger(FKeyName, Value);
 end;
 
-function TIntegerParam.ReadValue(const IniFile: TIniFile): Integer;
-begin
-  Result := IniFile.ReadInteger(FKeyPath, FKeyName, FEmptyValue);
-end;
+{ TIniIntegerParam }
 
-procedure TIntegerParam.SaveValue(const IniFile: TIniFile; const Value: Integer);
-begin
-  IniFile.WriteInteger(FKeyPath, FKeyName, Value);
-end;
-
-{ TDoubleParam }
-
-function TDoubleParam.DefaultEmptyValue: Double;
+function TIniIntegerParam.DefaultEmptyValue: Integer;
 begin
   Result := 0;
 end;
 
-function TDoubleParam.ReadValue(const Registry: TRegistry): Double;
+function TIniIntegerParam.ReadValue(const Context: TIniFile): Integer;
 begin
-  Result := Registry.ReadFloat(FKeyName);
+  Result := Context.ReadInteger(FKeyPath, FKeyName, FEmptyValue);
 end;
 
-procedure TDoubleParam.SaveValue(const Registry: TRegistry; const Value: Double);
+procedure TIniIntegerParam.SaveValue(const Context: TIniFile; const Value: Integer);
 begin
-  Registry.WriteFloat(FKeyName, Value);
+  Context.WriteInteger(FKeyPath, FKeyName, Value);
 end;
 
-function TDoubleParam.ReadValue(const IniFile: TIniFile): Double;
-begin
-  Result := IniFile.ReadFloat(FKeyPath, FKeyName, FEmptyValue);
-end;
+{ TRegDoubleParam }
 
-procedure TDoubleParam.SaveValue(const IniFile: TIniFile; const Value: Double);
-begin
-  IniFile.WriteFloat(FKeyPath, FKeyName, Value);
-end;
-
-{ TDateTimeParam }
-
-function TDateTimeParam.DefaultEmptyValue: TDateTime;
+function TRegDoubleParam.DefaultEmptyValue: Double;
 begin
   Result := 0;
 end;
 
-function TDateTimeParam.ReadValue(const Registry: TRegistry): TDateTime;
+function TRegDoubleParam.ReadValue(const Context: TRegistry): Double;
 begin
-  Result := Registry.ReadDateTime(FKeyName);
+  Result := Context.ReadFloat(FKeyName);
 end;
 
-procedure TDateTimeParam.SaveValue(const Registry: TRegistry; const Value: TDateTime);
+procedure TRegDoubleParam.SaveValue(const Context: TRegistry; const Value: Double);
 begin
-  Registry.WriteDateTime(FKeyName, Value);
+  Context.WriteFloat(FKeyName, Value);
 end;
 
-function TDateTimeParam.ReadValue(const IniFile: TIniFile): TDateTime;
+{ TIniDoubleParam }
+
+function TIniDoubleParam.DefaultEmptyValue: Double;
 begin
-  Result := IniFile.ReadDateTime(FKeyPath, FKeyName, FEmptyValue);
+  Result := 0;
 end;
 
-procedure TDateTimeParam.SaveValue(const IniFile: TIniFile; const Value: TDateTime);
+function TIniDoubleParam.ReadValue(const Context: TIniFile): Double;
 begin
-  IniFile.WriteDateTime(FKeyPath, FKeyName, Value);
+  Result := Context.ReadFloat(FKeyPath, FKeyName, FEmptyValue);
+end;
+
+procedure TIniDoubleParam.SaveValue(const Context: TIniFile; const Value: Double);
+begin
+  Context.WriteFloat(FKeyPath, FKeyName, Value);
+end;
+
+{ TRegDateTimeParam }
+
+function TRegDateTimeParam.DefaultEmptyValue: TDateTime;
+begin
+  Result := 0;
+end;
+
+function TRegDateTimeParam.ReadValue(const Context: TRegistry): TDateTime;
+begin
+  Result := Context.ReadDateTime(FKeyName);
+end;
+
+procedure TRegDateTimeParam.SaveValue(const Context: TRegistry; const Value: TDateTime);
+begin
+  Context.WriteDateTime(FKeyName, Value);
+end;
+
+{ TIniDateTimeParam }
+
+function TIniDateTimeParam.DefaultEmptyValue: TDateTime;
+begin
+  Result := 0;
+end;
+
+function TIniDateTimeParam.ReadValue(const Context: TIniFile): TDateTime;
+begin
+  Result := Context.ReadDateTime(FKeyPath, FKeyName, FEmptyValue);
+end;
+
+procedure TIniDateTimeParam.SaveValue(const Context: TIniFile; const Value: TDateTime);
+begin
+  Context.WriteDateTime(FKeyPath, FKeyName, Value);
+end;
+
+{ TRegTimeParam }
+
+function TRegTimeParam.DefaultEmptyValue: TTime;
+begin
+  Result := 0;
+end;
+
+function TRegTimeParam.ReadValue(const Context: TRegistry): TTime;
+begin
+  Result := Context.ReadTime(FKeyName);
+end;
+
+procedure TRegTimeParam.SaveValue(const Context: TRegistry; const Value: TTime);
+begin
+  Context.WriteTime(FKeyName, Value);
+end;
+
+{ TIniTimeParam }
+
+function TIniTimeParam.DefaultEmptyValue: TTime;
+begin
+  Result := 0;
+end;
+
+function TIniTimeParam.ReadValue(const Context: TIniFile): TTime;
+begin
+  Result := Context.ReadTime(FKeyPath, FKeyName, FEmptyValue);
+end;
+
+procedure TIniTimeParam.SaveValue(const Context: TIniFile; const Value: TTime);
+begin
+  Context.WriteTime(FKeyPath, FKeyName, Value);
 end;
 
 end.
