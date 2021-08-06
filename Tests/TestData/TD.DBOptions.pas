@@ -4,16 +4,16 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Variants, IniFiles, App.Options,
-  App.Params, App.DB.Options;
+  App.Params, App.DB.Options, Registry;
 
 type
   TDBOptions = class(TCLDBOptions)
   private
-    FBooleanParam: TBooleanParam;
-    FIntegerParam: TIntegerParam;
-    FStringParam: TStringParam;
-    FDoubleParam: TDoubleParam;
-    FDateTimeParam: TDateTimeParam;
+    FBooleanParam: TRegBooleanParam;
+    FIntegerParam: TRegIntegerParam;
+    FStringParam: TRegStringParam;
+    FDoubleParam: TRegDoubleParam;
+    FDateTimeParam: TRegDateTimeParam;
 
     function GetBooleanParam: Boolean;
     procedure SetBooleanParam(const Value: Boolean);
@@ -29,8 +29,10 @@ type
     constructor Create(Owner: TComponent); override;
     destructor Destroy(); override;
 
-    procedure LoadFromIniFile(const IniFile: TIniFile); override;
-    procedure SaveToIniFile(const IniFile: TIniFile); override;
+//    procedure Load(const Registry: TRegistry); overload; override;
+//    procedure Load(const IniFile: TIniFile); overload; override;
+//    procedure Save(const Registry: TRegistry); overload; override;
+//    procedure Save(const IniFile: TIniFile); overload; override;
 
     property BooleanParam: Boolean read GetBooleanParam write SetBooleanParam;
     property IntegerParam: Integer read GetIntegerParam write SetIntegerParam;
@@ -55,11 +57,11 @@ constructor TDBOptions.Create(Owner: TComponent);
 begin
   inherited;
 
-  FBooleanParam := TBooleanParam.Create(BooleanParamName, TestGroupName);
-  FIntegerParam := TIntegerParam.Create(IntegerParamName, TestGroupName);
-  FStringParam := TStringParam.Create(StringParamName, TestGroupName);
-  FDoubleParam := TDoubleParam.Create(DoubleParamName, TestGroupName);
-  FDateTimeParam := TDateTimeParam.Create(DateTimeParamName, TestGroupName);
+//  FBooleanParam := TBooleanParam.Create(BooleanParamName, TestGroupName);
+//  FIntegerParam := TIntegerParam.Create(IntegerParamName, TestGroupName);
+//  FStringParam := TStringParam.Create(StringParamName, TestGroupName);
+//  FDoubleParam := TDoubleParam.Create(DoubleParamName, TestGroupName);
+//  FDateTimeParam := TDateTimeParam.Create(DateTimeParamName, TestGroupName);
 end;
 
 destructor TDBOptions.Destroy;
@@ -123,26 +125,40 @@ begin
   FDateTimeParam.Value := Value;
 end;
 
-procedure TDBOptions.LoadFromIniFile(const IniFile: TIniFile);
-begin
-  inherited;
-
-  FBooleanParam.Load(IniFile);
-  FIntegerParam.Load(IniFile);
-  FStringParam.Load(IniFile);
-  FDoubleParam.Load(IniFile);
-  FDateTimeParam.Load(IniFile);
-end;
-
-procedure TDBOptions.SaveToIniFile(const IniFile: TIniFile);
-begin
-  inherited;
-
-  FBooleanParam.Save(IniFile);
-  FIntegerParam.Save(IniFile);
-  FStringParam.Save(IniFile);
-  FDoubleParam.Save(IniFile);
-  FDateTimeParam.Load(IniFile);
-end;
+//procedure TDBOptions.Load(const Registry: TRegistry);
+//begin
+//  FBooleanParam.Load(Registry);
+//  FIntegerParam.Load(Registry);
+//  FStringParam.Load(Registry);
+//  FDoubleParam.Load(Registry);
+//  FDateTimeParam.Load(Registry);
+//end;
+//
+//procedure TDBOptions.Load(const IniFile: TIniFile);
+//begin
+//  FBooleanParam.Load(IniFile);
+//  FIntegerParam.Load(IniFile);
+//  FStringParam.Load(IniFile);
+//  FDoubleParam.Load(IniFile);
+//  FDateTimeParam.Load(IniFile);
+//end;
+//
+//procedure TDBOptions.Save(const IniFile: TIniFile);
+//begin
+//  FBooleanParam.Save(IniFile);
+//  FIntegerParam.Save(IniFile);
+//  FStringParam.Save(IniFile);
+//  FDoubleParam.Save(IniFile);
+//  FDateTimeParam.Load(IniFile);
+//end;
+//
+//procedure TDBOptions.Save(const Registry: TRegistry);
+//begin
+//  FBooleanParam.Save(Registry);
+//  FIntegerParam.Save(Registry);
+//  FStringParam.Save(Registry);
+//  FDoubleParam.Save(Registry);
+//  FDateTimeParam.Load(Registry);
+//end;
 
 end.

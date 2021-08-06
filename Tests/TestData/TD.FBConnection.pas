@@ -3,15 +3,15 @@
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Variants,App.DB.Connection,
-  FireDAC.Comp.Client, IBX.IBServices, FireDAC.Phys.IBWrapper, FireDAC.Phys.IBBase,
-  FireDAC.Phys.FB, App.FB.Connection;
+  System.Classes, System.SysUtils, System.Variants, App.DB.Connection,
+  Uni, App.FB.Connection,
+  {$I DB_Links.inc};
 
 type
   TFBConnection = class(TCLFBConnection)
   private
   protected
-    procedure DoConnect(const Connection: TFDConnection); override;
+    procedure DoConnect(const Connection: TDBConnection); override;
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy(); override;
@@ -33,7 +33,7 @@ begin
   inherited;
 end;
 
-procedure TFBConnection.DoConnect(const Connection: TFDConnection);
+procedure TFBConnection.DoConnect(const Connection: TDBConnection);
 begin
   inherited;
 

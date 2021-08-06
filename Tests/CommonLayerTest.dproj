@@ -73,7 +73,8 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Manifest_File>None</Manifest_File>
+        <DCC_UnitSearchPath>d:\Projects\Delphi\CommonLayer\Source\;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_Define>FIREDAC;$(DCC_Define)</DCC_Define>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
     </PropertyGroup>
@@ -88,10 +89,10 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="..\Source\App.Application.pas"/>
-        <DCCReference Include="..\Source\App.DBApplication.pas"/>
-        <DCCReference Include="..\Source\App.DBConnection.pas"/>
-        <DCCReference Include="..\Source\App.DBOptions.pas"/>
-        <DCCReference Include="..\Source\App.FBConnection.pas"/>
+        <DCCReference Include="..\Source\App.DB.Application.pas"/>
+        <DCCReference Include="..\Source\App.DB.Connection.pas"/>
+        <DCCReference Include="..\Source\App.DB.Options.pas"/>
+        <DCCReference Include="..\Source\App.FB.Connection.pas"/>
         <DCCReference Include="..\Source\App.Options.pas"/>
         <DCCReference Include="..\Source\App.Params.pas"/>
         <DCCReference Include="TestData\TD.DBOptions.pas"/>
@@ -99,6 +100,17 @@
         <DCCReference Include="TestData\TD.FBConnection.pas"/>
         <DCCReference Include="FBConnectionTest.pas"/>
         <DCCReference Include="TestData\TD.Constants.pas"/>
+        <DCCReference Include="TestData\TD.DBApplication.pas"/>
+        <DCCReference Include="..\Source\App.DB.DAO.pas"/>
+        <DCCReference Include="..\Source\App.DB.Entity.pas"/>
+        <DCCReference Include="..\Source\App.DB.MetaData.pas"/>
+        <DCCReference Include="..\Source\App.DB.Columns.pas"/>
+        <DCCReference Include="..\Source\App.SysUtils.pas"/>
+        <DCCReference Include="..\Source\App.DB.Service.pas"/>
+        <DCCReference Include="..\Source\App.Constants.pas"/>
+        <DCCReference Include="..\Source\App.SQLite.Connection.pas"/>
+        <DCCReference Include="..\Source\App.MSSQL.Connection.pas"/>
+        <DCCReference Include="..\Source\App.DB.Types.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

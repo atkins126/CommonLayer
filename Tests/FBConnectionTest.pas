@@ -4,9 +4,7 @@ interface
 
 uses
   TestFramework, System.SysUtils, App.FB.Connection, System.Variants,
-  FireDAC.Phys.IBBase, FireDAC.Phys.FB, IBX.IBServices, App.DB.Connection,
-  TD.FBConnection, FireDAC.Phys.IBWrapper, System.Classes, FireDAC.Comp.Client,
-  TD.Constants;
+  Uni, App.DB.Connection, TD.FBConnection, TD.Constants;
 
 type
   TestTFBConnection = class(TTestCase)
@@ -36,7 +34,11 @@ end;
 
 procedure TestTFBConnection.TestConnect;
 begin
-  FConnection.Connect(DBServer, DBDatabase, DBLogin, DBPassword);
+  FConnection.Server := DBServer;
+  FConnection.Database := DBDatabase;
+  FConnection.UserName := DBLogin;
+  FConnection.Password := DBPassword;
+  FConnection.Connect;
   CheckTrue(FConnection.Connected);
   CheckTrue(FConnection.ConnectionStatus = cnConnect);
 end;
@@ -55,7 +57,11 @@ end;
 
 procedure TestTFBConnection.TestDisconnect;
 begin
-  FConnection.Connect(DBServer, DBDatabase, DBLogin, DBPassword);
+  FConnection.Server := DBServer;
+  FConnection.Database := DBDatabase;
+  FConnection.UserName := DBLogin;
+  FConnection.Password := DBPassword;
+  FConnection.Connect;
   CheckTrue(FConnection.Connected);
   CheckTrue(FConnection.ConnectionStatus = cnConnect);
 

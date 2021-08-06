@@ -3,9 +3,9 @@
 interface
 
 uses
-  TestFramework, System.SysUtils, App.Options, System.Variants, App.DB.Options,
-  TD.DBOptions, App.Params, IniFiles, System.Classes, Vcl.Forms, Math,
-  TD.Constants;
+  Winapi.Windows, TestFramework, System.SysUtils, App.Options, System.Variants,
+  App.DB.Options, TD.DBOptions, App.Params, IniFiles, System.Classes, Vcl.Forms,
+  Math, TD.Constants, Registry;
 
 type
   TestTDBOptions = class(TTestCase)
@@ -20,6 +20,9 @@ type
     procedure TestLoadDBParamsFromIniFile;
     procedure TestLoadAdditionalParamsFromIniFile;
     procedure TestSaveToIniFile;
+    procedure TestBoolean;
+
+    procedure TestSaveToRegistry;
   end;
 
 implementation
@@ -56,7 +59,7 @@ begin
 
   IniFile := TIniFile.Create(GetConfigFileName);
   try
-    FDBOptions.LoadFromIniFile(IniFile);
+    FDBOptions.Load(IniFile);
 
     CheckEquals(CompareText(FDBOptions.Server, DBServer), 0);
     CheckEquals(FDBOptions.Port, DBPort);
@@ -65,6 +68,25 @@ begin
     CheckEquals(CompareText(FDBOptions.Password, DBPassword), 0);
   finally
     IniFile.Free;
+  end;
+end;
+
+procedure TestTDBOptions.TestBoolean;
+var
+  i: Integer;
+  Res: TStrings;
+  CardNum, Name: string;
+begin
+  i := Integer(True);
+  i := Integer(False);
+
+  Res := TStringList.Create;
+  try
+    Res.Values['99999']:= 'John';
+    CardNum := Res.Names[0];
+    Name := Res.ValueFromIndex[0];
+  finally
+    Res.Free;
   end;
 end;
 
@@ -83,7 +105,7 @@ begin
 
   IniFile := TIniFile.Create(GetConfigFileName);
   try
-    FDBOptions.LoadFromIniFile(IniFile);
+    FDBOptions.Load(IniFile);
 
     CheckEquals(FDBOptions.BooleanParam, BooleanParam);
     CheckEquals(FDBOptions.IntegerParam, IntegerParam);
@@ -100,8 +122,22 @@ var
   IniFile: TIniFile;
 begin
   // TODO: Setup method call parameters
-  FDBOptions.SaveToIniFile(IniFile);
+  FDBOptions.Save(IniFile);
   // TODO: Validate method results
+end;
+
+procedure TestTDBOptions.TestSaveToRegistry;
+var
+  Reg: TRegistry;
+begin
+  Reg := TRegistry.Create;
+  try
+    Reg.RootKey:= HKEY_CURRENT_USER;
+
+//    FDBOptions.Save(Reg);
+  finally
+    Reg.Free;
+  end;
 end;
 
 initialization
