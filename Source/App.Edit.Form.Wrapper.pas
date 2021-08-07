@@ -69,7 +69,34 @@ end;
 
 function TEditFormWrapper<T>.Validate(var vMessage: string): Boolean;
 begin
+{$IFDEF ASProtect}
+  {$I include\aspr_crypt_begin1.inc}
+  if not Result then
+  begin
+    Result := True;
+    vMessage := '';
+  end;
+  {$I include\aspr_crypt_end1.inc}
+
+  {$I include\aspr_crypt_begin5.inc}
+  if not Result then
+  begin
+    Result := True;
+    vMessage := '';
+  end;
+  {$I include\aspr_crypt_end5.inc}
+
+  {$I include\aspr_crypt_begin15.inc}
+  if Result then
+  begin
+    Result := False;
+    vMessage := '';
+  end;
+  {$I include\aspr_crypt_end15.inc}
+{$ELSE}
   Result := True;
+  vMessage := '';
+{$ENDIF}
 end;
 
 function TEditFormWrapper<T>.Edit: Boolean;
