@@ -44,11 +44,18 @@ type
 
    TRegParam<T> = class(TCLParam<T, TRegistry>)
    private
+     class var FRegistry: TRegistry;
+   private
+     class procedure CreateRegistry;
+     class procedure ReleaseRegistry;
      function GetRegistryPath(): string;
    public
-     function Load(const Context: TRegistry): T; override;
+     function Load(const Context: TRegistry): T; overload; override;
+     function Load: T; overload;
      procedure Save(const Context: TRegistry; const Value: T); overload; override;
      procedure Save(const Context: TRegistry); overload; override;
+     procedure Save(const Value: T); overload;
+     procedure Save; overload;
    end;
 
    TIniParam<T> = class(TCLParam<T, TIniFile>)
@@ -148,6 +155,9 @@ implementation
 uses
   App.Constants;
 
+var
+  InternalRegistry: TRegistry;
+
 constructor TCLParam<T,C>.Create(const KeyName, KeyPath: string; const EmptyValue: T);
 begin
   inherited Create();
@@ -180,6 +190,17 @@ begin
 end;
 
 { TRegParam<T> }
+
+class procedure TRegParam<T>.CreateRegistry;
+begin
+  FRegistry := TRegistry.Create;
+  FRegistry.RootKey := HKEY_CURRENT_USER;
+end;
+
+class procedure TRegParam<T>.ReleaseRegistry;
+begin
+  FRegistry.Free;
+end;
 
 function TRegParam<T>.GetRegistryPath: string;
 begin
@@ -215,6 +236,11 @@ begin
   end;
 end;
 
+function TRegParam<T>.Load: T;
+begin
+  Result := Load(FRegistry);
+end;
+
 procedure TRegParam<T>.Save(const Context: TRegistry; const Value: T);
 begin
   Context.OpenKey(GetRegistryPath, True);
@@ -229,6 +255,16 @@ end;
 procedure TRegParam<T>.Save(const Context: TRegistry);
 begin
   Save(Context, FValue);
+end;
+
+procedure TRegParam<T>.Save(const Value: T);
+begin
+  Save(FRegistry, Value);
+end;
+
+procedure TRegParam<T>.Save;
+begin
+  Save(FRegistry, FValue);
 end;
 
 { TIniParam<T> }
@@ -453,5 +489,11 @@ procedure TIniTimeParam.SaveValue(const Context: TIniFile; const Value: TTime);
 begin
   Context.WriteTime(FKeyPath, FKeyName, Value);
 end;
+
+initialization
+  TRegIntegerParam.CreateRegistry;
+
+finalization
+  TRegIntegerParam.ReleaseRegistry;
 
 end.
