@@ -15,16 +15,6 @@ uses
   Registry, IniFiles;
 
 type
-  TRegistryRef = class(TRegistry)
-  private
-    FRefCount: Integer;
-  public
-    procedure AddRef;
-    procedure ObjRelease;
-
-    property RefCount: Integer read FRefCount write FRefCount;
-  end;
-
   TCLParam<T,C> = class(TPersistent)
   private
     FValue: T;
@@ -55,11 +45,11 @@ type
 
   TRegParam<T> = class(TCLParam<T, TRegistry>)
   private
-    class var FRegistry: TRegistryRef;
+    class var
+      FRegistry: TRegistry;
+      FRefCount: Integer;
   private
     function GetRegistryPath(): string;
-  protected
-
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -169,18 +159,6 @@ implementation
 uses
   App.Constants;
 
-{ TRegistryRef }
-
-procedure TRegistryRef.AddRef;
-begin
-  Inc(FRefCount);
-end;
-
-procedure TRegistryRef.ObjRelease;
-begin
-  Dec(FRefCount);
-end;
-
 constructor TCLParam<T, C>.Create;
 begin
   inherited Create;
@@ -225,18 +203,18 @@ begin
   inherited;
 
   if not Assigned(FRegistry) then begin
-    FRegistry := TRegistryRef.Create;
+    FRegistry := TRegistry.Create;
     FRegistry.RootKey := HKEY_CURRENT_USER;
-    FRegistry.RefCount := 1;
+    FRefCount := 1;
   end
   else
-    FRegistry.AddRef;
+    Inc(FRefCount);
 end;
 
 destructor TRegParam<T>.Destroy;
 begin
-  if FRegistry.RefCount > 1 then
-    FRegistry.ObjRelease
+  if FRefCount > 1 then
+    Dec(FRefCount)
   else
     FreeAndNil(FRegistry);
 
