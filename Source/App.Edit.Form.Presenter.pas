@@ -38,7 +38,7 @@ implementation
 
 constructor TEditFormPresenter<T>.Create(Owner: TComponent; Instance: T);
 begin
-  Create(Owner);
+  inherited Create(Owner);
 
   Self.Instance := Instance;
 end;
