@@ -1,4 +1,4 @@
-{*******************************************************}
+п»ї{*******************************************************}
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
@@ -6,31 +6,26 @@
 {                                                       }
 {*******************************************************}
 
-unit App.Edit.Form.Wrapper;
+unit App.Edit.Form.Presenter;
 
 interface
 
 uses
   System.SysUtils, System.Variants, System.Classes, Vcl.Controls,
-  eduDialog;
+  App.Dialog.Presenter, eduDialog;
 
 type
-  TEditFormWrapper<T> = class
+  TEditFormPresenter<T> = class(TDialogPresenter)
   private
     FInstance: T;
   protected
-    FEditDialog: TedDialog;
-
-    function DialogClass(): TDialogClass; virtual; abstract;
     procedure SetInstance(const Value: T); virtual;
     procedure PostValues; virtual; abstract;
     procedure OKAction; virtual; abstract;
     procedure Cancel; virtual; abstract;
-    function Validate(var vMessage: string): Boolean; virtual;
+    function Validate(var vMessage: string): Boolean; override;
   public
-    constructor Create(Owner: TComponent); overload; virtual;
     constructor Create(Owner: TComponent; Instance: T); overload; virtual;
-    destructor Destroy; override;
 
     function Edit: Boolean;
 
@@ -39,35 +34,21 @@ type
 
 implementation
 
-{ TEditFormWrapper<T> }
+{ TEditFormPresenter<T> }
 
-constructor TEditFormWrapper<T>.Create(Owner: TComponent);
-begin
-  inherited Create;
-
-  FEditDialog := DialogClass.Create(Owner);
-end;
-
-constructor TEditFormWrapper<T>.Create(Owner: TComponent; Instance: T);
+constructor TEditFormPresenter<T>.Create(Owner: TComponent; Instance: T);
 begin
   Create(Owner);
 
   Self.Instance := Instance;
 end;
 
-destructor TEditFormWrapper<T>.Destroy;
-begin
-  FEditDialog.Free;
-
-  inherited;
-end;
-
-procedure TEditFormWrapper<T>.SetInstance(const Value: T);
+procedure TEditFormPresenter<T>.SetInstance(const Value: T);
 begin
   FInstance := Value;
 end;
 
-function TEditFormWrapper<T>.Validate(var vMessage: string): Boolean;
+function TEditFormPresenter<T>.Validate(var vMessage: string): Boolean;
 begin
 {$IFDEF ASProtect}
   {$I include\aspr_crypt_begin1.inc}
@@ -99,7 +80,7 @@ begin
 {$ENDIF}
 end;
 
-function TEditFormWrapper<T>.Edit: Boolean;
+function TEditFormPresenter<T>.Edit: Boolean;
 var
   ErrorText: string;
 begin
@@ -116,7 +97,6 @@ begin
     Exit;
   end;
 
-  {запись отредактированных значений}
   PostValues;
   OKAction;
 end;
