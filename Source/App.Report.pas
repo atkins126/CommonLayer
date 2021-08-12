@@ -21,7 +21,6 @@ type
                        effTXT, effJPEG, effExcelByTemplate);
 
   TCLReport = class(TDataModule)
-    FReport: TfrxReport;
   private
     FInternalReport: TfrxReport;
     FDesigner: TfrxDesigner;
@@ -36,6 +35,7 @@ type
     function GetReportFileName: string;
     procedure SetReportFileName(const Value: string);
   protected
+    function GetReport: TfrxReport; virtual; abstract;
     function GetReportName: string; virtual; abstract;
 
     procedure OnShowReport(Sender: TObject);
@@ -55,7 +55,7 @@ type
 
     procedure AddNewVariable(const Category, Name: string);
 
-    property Report: TfrxReport read FReport;
+    property Report: TfrxReport read GetReport;
     property ReportName: string read GetReportName;
     property ReportFileName: string read GetReportFileName write SetReportFileName;
     property StorageFolder: string read GetStorageFolder;
@@ -81,6 +81,7 @@ begin
   inherited;
 
   FInternalReport := TfrxReport.Create(Self);
+  InternalReport.OnGetValue := Report.OnGetValue;
   FOnAfterLoad := nil;
 
   FDesigner := TfrxDesigner.Create(Self);
@@ -150,7 +151,7 @@ begin
   if FileExists(FileName) then
     FInternalReport.LoadFromFile(FileName)
   else
-    InternalReport := FReport;
+    InternalReport := Report;
 
   if Assigned(FOnAfterLoad) then
     FOnAfterLoad(FInternalReport);
@@ -168,7 +169,7 @@ begin
   if FileExists(FileName) then
     FInternalReport.LoadFromFile(FileName)
   else
-    InternalReport := FReport;
+    InternalReport := Report;
 
   if Assigned(FOnAfterLoad) then
     FOnAfterLoad(FInternalReport);
@@ -206,7 +207,7 @@ begin
   end
   else begin
     InternalReport.FileName := '';
-    InternalReport := FReport;
+    InternalReport := Report;
   end;
 
   frxDesignerComp.SaveDir := StorageFolder;
