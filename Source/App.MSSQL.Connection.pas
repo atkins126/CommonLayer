@@ -47,7 +47,7 @@ end;
 destructor TCLMSConnection.Destroy;
 begin
 {$IFDEF FIREDAC}
-  FMSSQLDriverLink := TFDPhysMSSQLDriverLink.Create(Self);
+  FMSSQLDriverLink.Free;
 {$ENDIF}
 
   inherited;

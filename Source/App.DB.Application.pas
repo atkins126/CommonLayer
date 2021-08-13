@@ -23,13 +23,13 @@ type
   protected
     FDBConnection: TCLDBConnection;
 
-    function OptionsClass(): TCLOptionsClass; override;
-    function DBConnectionClass(): TCLDBConnectionClass; virtual; abstract;
+    function OptionsClass: TCLOptionsClass; override;
+    function DBConnectionClass: TCLDBConnectionClass; virtual; abstract;
   public
     constructor Create(Owner: TComponent); override;
-    destructor Destroy(); override;
+    destructor Destroy; override;
 
-    procedure LoadSettingsFromDB(); virtual;
+    procedure LoadSettingsFromDB; virtual;
 
     property Connected: Boolean read GetConnected write SetConnected;
   end;
