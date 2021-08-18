@@ -25,6 +25,7 @@ type
   protected
     FOptions: TCLOptions;
     FSaveOptions: Boolean;
+    FVersion: string;
 
     function OptionsClass: TCLOptionsClass; virtual; abstract;
     function GetApplicationName: string; virtual;
@@ -57,6 +58,7 @@ constructor TCLApplication.Create(Owner: TComponent);
 begin
   inherited;
 
+  FVersion := '';
   AppName := ApplicationName;
   FOptions := OptionsClass.Create(Self);
   FSaveOptions := True;
@@ -143,8 +145,35 @@ begin
 end;
 
 function TCLApplication.GetVersion: string;
+type
+  TFileVersion = packed record
+    Minor: Word;
+    Major: Word;
+    Build: Word;
+    Release: Word;
+  end;
+
+var
+  Stream: TResourceStream;
+  Ver: TFileVersion;
 begin
-  Result := '1.0.0';
+  if FVersion <> '' then
+    Exit(FVersion);
+
+  FVersion := '1.0.0.0';
+  try
+    Stream := TResourceStream.Create(HInstance, '#1', RT_VERSION);
+    if Stream.Size = 0 then
+      Exit(FVersion);
+
+    Stream.Position := 48; // skip data
+    Stream.Read(Ver, SizeOf(TFileVersion));
+    FVersion := Format('%d.%d.%d.%d', [Ver.Major, Ver.Minor, Ver.Release, Ver.Build]);
+  finally
+    Stream.Free;
+  end;
+
+  Result := FVersion;
 end;
 
 function TCLApplication.GetConfigFileName: string;
