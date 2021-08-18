@@ -135,17 +135,21 @@ begin
     if Caption = '' then
       Caption:= 'Удалить текущую запись';
 
+  {$IFDEF CARDS}
     {если необходимо выводить подтверждение удаления записи}
-//    if WithConfirm then
-//      Result:= Confirm(Caption)
-//    else
-    Result := True;
+    if WithConfirm then
+      Result:= Confirm(Caption)
+    else
+  {$ENDIF}
+      Result := True;
 
     if Result then
       FDAO.Remove(Entity);
-  end;
-//  else
-//    ErrorMessage(Caption);
+  end
+{$IFDEF CARDS}
+  else
+    ErrorMessage(Caption)
+{$ENDIF};
 end;
 
 function TServiceCommon.GetAt(const ID: Integer): TEntity;

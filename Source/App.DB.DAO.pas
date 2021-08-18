@@ -38,7 +38,7 @@ type
   protected
     FConnection: TCLDBConnection;
 
-    function EntityClass(): TEntityClass; virtual; abstract;
+    function EntityClass: TEntityClass; virtual; abstract;
 
     {сгенерировать событие - Изменились данные}
     procedure DoAfterUpdate(const Entity: TEntity; const ModifyType: Integer);
@@ -47,14 +47,14 @@ type
     procedure RemoveAction(const Entity: TEntity); virtual;
   public
     constructor Create(const Connection: TCLDBConnection);
-    destructor Destroy(); override;
+    destructor Destroy; override;
 
     procedure Insert(const Entity: TEntity); virtual;
     procedure Update(const Entity: TEntity); virtual;
     procedure Remove(const Entity: TEntity); virtual;
     function GetAt(const ID: Integer): TEntity; virtual;
 
-    function GetNewInstance(): TEntity; virtual; //CreateInstance
+    function GetNewInstance: TEntity; virtual; //CreateInstance
 
     {на запись есть ссылки}
     function RecordUsed(const Entity: TEntity): Boolean; virtual;
