@@ -161,8 +161,8 @@ begin
     Exit(FVersion);
 
   FVersion := '1.0.0.0';
+  Stream := TResourceStream.Create(HInstance, '#1', RT_VERSION);
   try
-    Stream := TResourceStream.Create(HInstance, '#1', RT_VERSION);
     if Stream.Size = 0 then
       Exit(FVersion);
 
