@@ -11,8 +11,8 @@ unit App.DB.Service;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Variants, App.DB.Entity, App.DB.DAO,
-  App.DB.Connection;
+  System.Classes, System.SysUtils, System.Variants, App.DB.Utils, App.DB.Entity,
+  App.DB.DAO, App.DB.Connection, App.VCL.Helper;
 
 type
   TInformationMessage = procedure(Sender: TObject; Value: string) of object;
@@ -138,7 +138,7 @@ begin
   {$IFDEF CARDS}
     {если необходимо выводить подтверждение удаления записи}
     if WithConfirm then
-      Result:= Confirm(Caption)
+      Result:= TVCLHelper.Confirm(Caption)
     else
   {$ENDIF}
       Result := True;
@@ -148,7 +148,7 @@ begin
   end
 {$IFDEF CARDS}
   else
-    ErrorMessage(Caption)
+    TVCLHelper.ErrorMessage(Caption)
 {$ENDIF};
 end;
 

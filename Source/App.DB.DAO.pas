@@ -12,7 +12,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Variants, Data.DB,  App.DB.Connection,
-  App.DB.Entity , App.DB.MetaData,
+  App.DB.Entity , App.DB.MetaData, App.DB.Utils,
   {$I DB_Links.inc};
 
 const
