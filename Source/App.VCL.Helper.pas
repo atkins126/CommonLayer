@@ -11,20 +11,16 @@ unit App.VCL.Helper;
 interface
 
 uses
-  Winapi.Windows, System.SysUtils, System.Variants, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  {$IFDEF JVCL}{$IFNDEF EXTDLL}JvZlibMultiple,{$ENDIF}{$ENDIF} Vcl.FileCtrl;
+  Winapi.Windows, System.SysUtils, System.Variants, System.Zip, System.IOUtils,
+  Generics.Collections, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.FileCtrl;
 
 type
   TVCLHelper = class
   public
-    {выбор каталога}
     class function ChooseDirectory(Owner: TWinControl; const Caption: string; var Directory: string): Boolean;
 
-    {архивирование каталога}
-    class procedure CompressDirectory(const Source, FileName: string);
-
-    {разархивирование файла}
-    class procedure DecompressFile(const FileName, Directory: string);
+    class procedure ZipDirectory(const Source, FileName: string);
+    class procedure UnzipArchive(const FileName, Dest: string);
 
     class function MessageDlgExt(const Text, Caption: string; DlgType: TMsgDlgType; Buttons: TMsgDlgButtons): Integer;
     class procedure ErrorMessage(const Text: string; Args: array of const); overload;
@@ -49,36 +45,50 @@ begin
   Result :=  SelectDirectory(Msg, '', Directory, [sdNewUI], Owner);
 end;
 
-class procedure TVCLHelper.CompressDirectory(const Source, FileName: string);
-{$IFDEF JVCL}
+class procedure TVCLHelper.ZipDirectory(const Source, FileName: string);
 var
-  Zlib: TJvZlibMultiple;
-{$ENDIF}
+  ZipFile: TZipFile;
+  ArchiveFiles: TArray<string>;
+  SourceFile: string;
+  SourcePath: string;
+  DestFile: string;
 begin
-{$IFDEF JVCL}
-  Zlib := TJvZlibMultiple.Create(nil);
+  SourcePath := IncludeTrailingPathDelimiter(Source);
+
+  ZipFile:= TZipFile.Create;
   try
-    Zlib.CompressDirectory(Source, True, FileName);
+    ZipFile.Open(FileName, zmWrite);
+
+    ArchiveFiles := TDirectory.GetFiles(Source, '*.*', TSearchOption.soAllDirectories, nil);
+    for SourceFile in ArchiveFiles do begin
+      if SameText(SourcePath, ExtractFilePath(SourceFile)) then
+        DestFile := ExtractFileName(SourceFile)
+      else begin
+        DestFile := SourceFile;
+        Delete(DestFile, 1, Length(SourcePath));
+      end;
+
+      ZipFile.Add(SourceFile, DestFile, zcDeflate);
+    end;
+
+    ZipFile.Close;
   finally
-    Zlib.Free;
+    ZipFile.Free;
   end;
-{$ENDIF}
 end;
 
-class procedure TVCLHelper.DecompressFile(const FileName, Directory: string);
-{$IFDEF JVCL}
+class procedure TVCLHelper.UnzipArchive(const FileName, Dest: string);
 var
-  Zlib: TJvZlibMultiple;
-{$ENDIF}
+  ZipFile: TZipFile;
 begin
-{$IFDEF JVCL}
-  Zlib := TJvZlibMultiple.Create(nil);
+  ZipFile := TZipFile.Create;
   try
-    Zlib.DecompressFile(FileName, Directory, True);
+    ZipFile.Open(FileName, zmRead);
+    ZipFile.ExtractAll(Dest);
+    ZipFile.Close;
   finally
-    Zlib.Free;
+    ZipFile.Free;
   end;
-{$ENDIF}
 end;
 
 class function TVCLHelper.MessageDlgExt(const Text, Caption: string;
