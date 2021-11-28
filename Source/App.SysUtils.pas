@@ -103,7 +103,7 @@ var
 begin
   Stream:= TFileStream.Create(FileName, fmCreate);
   try
-    Stream.WriteBuffer(Pointer(Value)^, Length(Value));
+    Stream.WriteBuffer(Pointer(Value)^, Length(Value) * SizeOf(Char));
   finally
     Stream.Free;
   end;
