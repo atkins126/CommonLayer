@@ -18,6 +18,8 @@ uses
   function IsNull(const Value, ReplaceValue: Variant): Variant;
   function IfNull(const Value, NullValue: Variant): Variant;
 
+  function GetCurrentHID(Value: Integer): string;
+
 implementation
 
 function IsNullID(const Value: Variant): Boolean;
@@ -40,6 +42,14 @@ begin
     Result := Null
   else
     Result := Value;
+end;
+
+function GetCurrentHID(Value: Integer): string;
+const
+  HID_SIZE = 4;
+begin
+  Result := IntToStr(Value);
+  Result := StringOfChar('0', HID_SIZE - Length(Result)) + Result;
 end;
 
 end.
