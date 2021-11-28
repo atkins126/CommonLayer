@@ -11,14 +11,19 @@ unit App.SysUtils;
 interface
 
 uses
-  System.SysUtils, System.Variants, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Winapi.Windows,
-  Registry;
+  System.SysUtils, System.Variants, System.Classes, Vcl.Controls, Registry;
 
 type
   TRegHelper = class
   public
     class function ReadStr(const Key, DefaultValue: string): string;
     class procedure SaveStr(const Key, Value: string);
+  end;
+
+  TIOHelper = class
+  public
+    class function ReadStrFromFile(const FileName: string): string;
+    class procedure WriteStrToFile(const FileName, Value: string);
   end;
 
   function CodeString(const Value: string; Crypt: Boolean): string;
@@ -73,6 +78,34 @@ begin
     end;
 
     Result := Result + Chr(Res);
+  end;
+end;
+
+{ TIOHelper }
+
+class function TIOHelper.ReadStrFromFile(const FileName: string): string;
+var
+  Stream: TFileStream;
+begin
+  Stream := TFileStream.Create(FileName, fmOpenRead);
+  try
+    SetLength(Result, Stream.Size);
+    Stream.Position := 0;
+    Stream.ReadBuffer(Pointer(Result)^, Stream.Size);
+  finally
+    Stream.Free;
+  end;
+end;
+
+class procedure TIOHelper.WriteStrToFile(const FileName, Value: string);
+var
+  Stream: TFileStream;
+begin
+  Stream:= TFileStream.Create(FileName, fmCreate);
+  try
+    Stream.WriteBuffer(Pointer(Value)^, Length(Value));
+  finally
+    Stream.Free;
   end;
 end;
 
