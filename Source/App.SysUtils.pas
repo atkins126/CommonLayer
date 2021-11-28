@@ -14,14 +14,20 @@ uses
   System.SysUtils, System.Variants, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Winapi.Windows,
   Registry;
 
-  function ReadStr(const Key, DefaultValue: string): string;
-  procedure SaveStr(const Key, Value: string);
+type
+  TRegHelper = class
+  public
+    class function ReadStr(const Key, DefaultValue: string): string;
+    class procedure SaveStr(const Key, Value: string);
+  end;
 
   function CodeString(const Value: string; Crypt: Boolean): string;
 
 implementation
 
-function ReadStr(const Key, DefaultValue: string): String;
+{TRegHelper}
+
+class function TRegHelper.ReadStr(const Key, DefaultValue: string): String;
 var
   Reg: TRegIniFile;
 begin
@@ -33,7 +39,7 @@ begin
   end;
 end;
 
-procedure SaveStr(const Key, Value: string);
+class procedure TRegHelper.SaveStr(const Key, Value: string);
 var
   Reg: TRegIniFile;
 begin
