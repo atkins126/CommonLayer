@@ -12,7 +12,7 @@ interface
 
 uses
   Winapi.Windows, System.SysUtils, System.Variants, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Vcl.FileCtrl, JvZlibMultiple;
+  {$IFDEF JVCL}{$IFNDEF EXTDLL}JvZlibMultiple,{$ENDIF}{$ENDIF} Vcl.FileCtrl;
 
 type
   TVCLHelper = class
@@ -50,27 +50,35 @@ begin
 end;
 
 class procedure TVCLHelper.CompressDirectory(const Source, FileName: string);
+{$IFDEF JVCL}
 var
   Zlib: TJvZlibMultiple;
+{$ENDIF}
 begin
+{$IFDEF JVCL}
   Zlib := TJvZlibMultiple.Create(nil);
   try
     Zlib.CompressDirectory(Source, True, FileName);
   finally
     Zlib.Free;
   end;
+{$ENDIF}
 end;
 
 class procedure TVCLHelper.DecompressFile(const FileName, Directory: string);
+{$IFDEF JVCL}
 var
   Zlib: TJvZlibMultiple;
+{$ENDIF}
 begin
+{$IFDEF JVCL}
   Zlib := TJvZlibMultiple.Create(nil);
   try
     Zlib.DecompressFile(FileName, Directory, True);
   finally
     Zlib.Free;
   end;
+{$ENDIF}
 end;
 
 class function TVCLHelper.MessageDlgExt(const Text, Caption: string;
