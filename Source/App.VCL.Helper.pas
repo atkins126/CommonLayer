@@ -12,7 +12,8 @@ interface
 
 uses
   Winapi.Windows, System.SysUtils, System.Variants, System.Zip, System.IOUtils,
-  Generics.Collections, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.FileCtrl;
+  Generics.Collections, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.FileCtrl,
+  Winapi.ActiveX, Winapi.ShellAPI;
 
 type
   TVCLHelper = class
@@ -29,6 +30,12 @@ type
     class procedure Information(const Text: string);
 
     class procedure CenterButtons(Width: Integer; Button1, Button2: TWinControl);
+
+    class procedure ShellExecute(const AWnd: HWND; const AOperation, AFileName: string;
+                                 const AParameters: string = ''; const ADirectory: string = '';
+                                 const AShowCmd: Integer = SW_SHOWNORMAL);
+
+    class procedure DelayedExecution(const FileName, Parameters: string);
   end;
 
 implementation
@@ -176,6 +183,69 @@ begin
   Button2.Left := Left;
   if Button1.Visible and Button2.Visible then
     Button2.Left := Left + 10 + Button1.Width + 1;
+end;
+
+class procedure TVCLHelper.ShellExecute(const AWnd: HWND; const AOperation, AFileName,
+  AParameters, ADirectory: string; const AShowCmd: Integer);
+var
+  ExecInfo: TShellExecuteInfo;
+  NeedUnitialize: Boolean;
+  ExitCode: Cardinal;
+begin
+  Assert(AFileName <> '');
+
+  NeedUnitialize := Succeeded(CoInitializeEx(nil, COINIT_APARTMENTTHREADED or COINIT_DISABLE_OLE1DDE));
+  try
+    FillChar(ExecInfo, SizeOf(ExecInfo), 0);
+    ExecInfo.cbSize := SizeOf(ExecInfo);
+
+    ExecInfo.Wnd := AWnd;
+    ExecInfo.lpVerb := Pointer(AOperation);
+    ExecInfo.lpFile := PChar(AFileName);
+    ExecInfo.lpParameters := Pointer(AParameters);
+    ExecInfo.lpDirectory := Pointer(ADirectory);
+    ExecInfo.nShow := AShowCmd;
+    ExecInfo.fMask := SEE_MASK_NOASYNC { = SEE_MASK_FLAG_DDEWAIT для старых версий Delphi }
+                   or SEE_MASK_FLAG_NO_UI;
+  {$IFDEF UNICODE}
+    ExecInfo.fMask := ExecInfo.fMask or SEE_MASK_UNICODE;
+  {$ENDIF}
+
+  {$WARN SYMBOL_PLATFORM OFF}
+    Win32Check(ShellExecuteEx(@ExecInfo));
+  {$WARN SYMBOL_PLATFORM ON}
+  finally
+    TVCLHelper.Information('Finished');
+    if NeedUnitialize then
+      CoUninitialize;
+  end;
+end;
+
+class procedure TVCLHelper.DelayedExecution(const FileName, Parameters: string);
+var
+  StartupInfo: TStartupInfo;
+  ProcessInfo: TProcessInformation;
+  WaitRes: Cardinal;
+begin
+  FillChar(StartupInfo, SizeOf(StartupInfo), 0);
+  FillChar(ProcessInfo, SizeOf(ProcessInfo), 0);
+  StartupInfo.wShowWindow := SW_SHOW;
+
+  CreateProcess(nil,
+                PChar(FileName + ' ' + Parameters),
+                nil,
+                nil,
+                True,
+                CREATE_NEW_CONSOLE,
+                nil,
+                PChar(ExtractFileDir(Application.ExeName)),
+                StartupInfo,
+                ProcessInfo);
+
+  repeat
+    WaitRes := WaitForSingleObject(ProcessInfo.hProcess, 200);
+    Application.ProcessMessages;
+  until WaitRes = WAIT_OBJECT_0;
 end;
 
 end.
