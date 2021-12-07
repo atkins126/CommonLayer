@@ -86,12 +86,16 @@ end;
 class function TIOHelper.ReadStrFromFile(const FileName: string): string;
 var
   Stream: TFileStream;
+  Buf: TBytes;
 begin
   Stream := TFileStream.Create(FileName, fmOpenRead);
   try
     SetLength(Result, Stream.Size);
     Stream.Position := 0;
-    Stream.ReadBuffer(Pointer(Result)^, Stream.Size);
+    SetLength(Buf, Stream.Size);
+    Stream.ReadBuffer(Buf, Stream.Size);
+
+    Result := TEncoding.Unicode.GetString(Buf);
   finally
     Stream.Free;
   end;
