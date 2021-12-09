@@ -11,8 +11,8 @@ unit App.DB.Service;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Variants, App.DB.Entity, App.DB.DAO,
-  App.DB.Connection;
+  System.Classes, System.SysUtils, System.Variants, App.DB.Utils, App.DB.Entity,
+  App.DB.DAO, App.DB.Connection, App.VCL.Helper;
 
 type
   TInformationMessage = procedure(Sender: TObject; Value: string) of object;
@@ -135,17 +135,21 @@ begin
     if Caption = '' then
       Caption:= 'Удалить текущую запись';
 
+  {$IFDEF CARDS}
     {если необходимо выводить подтверждение удаления записи}
-//    if WithConfirm then
-//      Result:= Confirm(Caption)
-//    else
-    Result := True;
+    if WithConfirm then
+      Result:= TVCLHelper.Confirm(Caption)
+    else
+  {$ENDIF}
+      Result := True;
 
     if Result then
       FDAO.Remove(Entity);
-  end;
-//  else
-//    ErrorMessage(Caption);
+  end
+{$IFDEF CARDS}
+  else
+    TVCLHelper.ErrorMessage(Caption)
+{$ENDIF};
 end;
 
 function TServiceCommon.GetAt(const ID: Integer): TEntity;

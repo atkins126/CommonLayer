@@ -153,6 +153,7 @@ begin
   FTransaction := TFDTransaction.Create(Self);
   FErrorDialog := TFDGUIxErrorDialog.Create(Self);
   FWaitCursor := TFDGUIxWaitCursor.Create(Self);
+  FWaitCursor.Provider := 'Forms';
 
   FConnection.Transaction := FTransaction;
   FTransaction.Connection := FConnection;

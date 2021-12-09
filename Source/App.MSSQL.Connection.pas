@@ -33,6 +33,9 @@ type
 
 implementation
 
+uses
+  App.Constants;
+
 { TCLMSConnection }
 
 constructor TCLMSConnection.Create(Owner: TComponent);
@@ -47,7 +50,7 @@ end;
 destructor TCLMSConnection.Destroy;
 begin
 {$IFDEF FIREDAC}
-  FMSSQLDriverLink := TFDPhysMSSQLDriverLink.Create(Self);
+  FMSSQLDriverLink.Free;
 {$ENDIF}
 
   inherited;
@@ -82,6 +85,7 @@ begin
   Connection.Params.Add('Database=' + Database);
   Connection.Params.Values['User_Name'] := UserName;
   Connection.Params.Values['Password'] := Password;
+  Connection.Params.Values['ApplicationName'] := AppName;
   Connection.LoginPrompt := False;
 {$ENDIF}
 
