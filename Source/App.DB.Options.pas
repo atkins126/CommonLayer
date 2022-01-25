@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2020 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2022 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 

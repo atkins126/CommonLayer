@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2021 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2022 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -12,8 +12,8 @@ interface
 
 uses
   Winapi.Windows, System.SysUtils, System.Variants, System.Zip, System.IOUtils,
-  Generics.Collections, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.FileCtrl,
-  Winapi.ActiveX, Winapi.ShellAPI;
+  System.Types, Generics.Collections, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  Vcl.FileCtrl, Winapi.ActiveX, Winapi.ShellAPI;
 
 type
   TVCLHelper = class
@@ -55,7 +55,7 @@ end;
 class procedure TVCLHelper.ZipDirectory(const Source, FileName: string);
 var
   ZipFile: TZipFile;
-  ArchiveFiles: TArray<string>;
+  ArchiveFiles: {$IFDEF VER330}TArray<string>{$ELSE}TStringDynArray{$ENDIF};
   SourceFile: string;
   SourcePath: string;
   DestFile: string;
@@ -66,7 +66,11 @@ begin
   try
     ZipFile.Open(FileName, zmWrite);
 
+  {$IFDEF VER330}
     ArchiveFiles := TDirectory.GetFiles(Source, '*.*', TSearchOption.soAllDirectories, nil);
+  {$ELSE}
+    ArchiveFiles := TDirectory.GetFiles(Source, '*.*', TSearchOption.soAllDirectories);
+  {$ENDIF}
     for SourceFile in ArchiveFiles do begin
       if SameText(SourcePath, ExtractFilePath(SourceFile)) then
         DestFile := ExtractFileName(SourceFile)
