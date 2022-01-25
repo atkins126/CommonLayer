@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2021 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2022 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -89,8 +89,7 @@ type
     constructor Create(Owner: TComponent); override;
     destructor Destroy(); override;
 
-    procedure Connect(const Server, DataBase, UserName, Password: string; Port: Integer); overload;
-    procedure Connect; overload;
+    procedure Connect;
     procedure Disconnect;
 
     function IsTableExists(const TableName: string): Boolean; virtual; abstract; 
@@ -485,27 +484,15 @@ begin
   end;
 end;
 
-procedure TCLDBConnection.Connect(const Server, DataBase, UserName, Password: string; Port: Integer);
+procedure TCLDBConnection.Connect;
 begin
   if FConnection.Connected then
     Exit;
-
-  {устанавливаем настройки подключения к БД}
-  Self.Server := Server;
-  Self.Database := DataBase;
-  Self.UserName := UserName;
-  Self.Password := Password;
-  Self.Port := Port;
 
   DoConnect(FConnection);
 
   if not Connected then
     raise Exception.Create('Подключение к БД не выполнено');
-end;
-
-procedure TCLDBConnection.Connect;
-begin
-  Connect(Server, DataBase, UserName, Password, Port);
 end;
 
 procedure TCLDBConnection.Disconnect;
