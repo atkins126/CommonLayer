@@ -40,17 +40,22 @@ type
   TEntity = class(TPersistent)
   private
     FID: Variant;
+
+    function GetIsNewInstance: Boolean;
   protected
   public
-    constructor Create(); virtual;
-    destructor Destroy(); override;
+    constructor Create; virtual;
+    destructor Destroy; override;
 
-    class function EntityName(): string; virtual; abstract;
-    class function FieldList(): string; virtual; abstract;
+    procedure Assign(const Source: TEntity); virtual;
+
+    class function EntityName: string; virtual; abstract;
+    class function FieldList: string; virtual; abstract;
   published
     [TIDAttribute]
     [TColumnAttribute('ID')]
     property ID: Variant read FID write FID;
+    property IsNewInstance: Boolean read GetIsNewInstance;
   end;
 
 implementation
@@ -75,7 +80,7 @@ end;
 
 { TEntity }
 
-constructor TEntity.Create();
+constructor TEntity.Create;
 begin
   inherited;
 
@@ -86,6 +91,16 @@ destructor TEntity.Destroy;
 begin
 
   inherited;
+end;
+
+function TEntity.GetIsNewInstance: Boolean;
+begin
+  Result := VarIsNull(ID) or VarIsEmpty(ID);
+end;
+
+procedure TEntity.Assign(const Source: TEntity);
+begin
+  FID := Source.ID;
 end;
 
 end.

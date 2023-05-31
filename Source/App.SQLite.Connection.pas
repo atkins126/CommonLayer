@@ -12,7 +12,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Variants, App.DB.Connection,
-  {$IFDEF UNIDAC}SQLiteUniProvider,{$ENDIF}
+  {$IFDEF UNIDAC}UniProvider, SQLiteUniProvider,{$ENDIF}
   {$IFDEF FIREDAC}FireDAC.Phys.SQLite,{$ENDIF}
   {$I DB_Links.inc};
 
