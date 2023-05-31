@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2021 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2022 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -12,7 +12,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Variants, App.DB.Connection,
-  {$IFDEF UNIDAC}SQLiteUniProvider,{$ENDIF}
+  {$IFDEF UNIDAC}UniProvider, SQLiteUniProvider,{$ENDIF}
   {$IFDEF FIREDAC}FireDAC.Phys.SQLite,{$ENDIF}
   {$I DB_Links.inc};
 

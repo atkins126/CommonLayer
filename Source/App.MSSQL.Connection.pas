@@ -2,7 +2,7 @@
 {                                                       }
 {       Common layer of project                         }
 {                                                       }
-{       Copyright (c) 2018 - 2021 Sergey Lubkov         }
+{       Copyright (c) 2018 - 2022 Sergey Lubkov         }
 {                                                       }
 {*******************************************************}
 
@@ -17,8 +17,18 @@ uses
   {$I DB_Links.inc};
 
 type
+{$IFDEF UNIDAC}
+  TMSProvider = (prAuto, prSQL, prNativeClient, prMSOLEDB, prDirect);
+{$ENDIF}
+
   TCLMSConnection = class(TCLDBConnection)
   private
+  {$IFDEF UNIDAC}
+    function StrToProvider(const Value: string): TMSProvider;
+    function ProviderToStr(const Value: TMSProvider): string;
+    function GetProvider: TMSProvider;
+    procedure SetProvider(const Value: TMSProvider);
+  {$ENDIF}
   {$IFDEF FIREDAC}
     FMSSQLDriverLink: TFDPhysMSSQLDriverLink;
   {$ENDIF}
@@ -29,6 +39,10 @@ type
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy(); override;
+
+  {$IFDEF UNIDAC}
+    property Provider: TMSProvider read GetProvider write SetProvider;
+  {$ENDIF}
   end;
 
 implementation
@@ -55,6 +69,57 @@ begin
 
   inherited;
 end;
+
+{$IFDEF UNIDAC}
+function TCLMSConnection.StrToProvider(const Value: string): TMSProvider;
+begin
+  if SameText(Value, 'prSQL') then
+    Result := prSQL
+  else
+  if SameText(Value, 'prNativeClient') then
+    Result := prNativeClient
+  else
+  if SameText(Value, 'prMSOLEDB') then
+    Result := prMSOLEDB
+  else
+  if SameText(Value, 'prDirect') then
+    Result := prDirect
+  else
+    Result := prAuto;
+end;
+
+function TCLMSConnection.ProviderToStr(const Value: TMSProvider): string;
+begin
+  case Value of
+    prSQL:
+      Result := 'prSQL';
+    prNativeClient:
+      Result := 'prNativeClient';
+    prMSOLEDB:
+      Result := 'prMSOLEDB';
+    prDirect:
+      Result := 'prDirect';
+    else
+      Result := 'prAuto';
+  end;
+end;
+
+function TCLMSConnection.GetProvider: TMSProvider;
+var
+  pr: string;
+begin
+  pr := Connection.SpecificOptions.Values['SQL Server.Provider'];
+  Result := StrToProvider(pr);
+end;
+
+procedure TCLMSConnection.SetProvider(const Value: TMSProvider);
+var
+  pr: string;
+begin
+  pr := ProviderToStr(Value);
+  Connection.SpecificOptions.Values['SQL Server.Provider'] := pr;
+end;
+{$ENDIF}
 
 procedure TCLMSConnection.DoConnect(const Connection: TDBConnection);
 var
@@ -91,7 +156,7 @@ begin
 
 {$IFDEF UNIDAC}
   Connection.ProviderName := 'SQL Server';
-  Connection.SpecificOptions.Values['Provider'] := 'prNativeClient';  //prDirect
+//  Connection.SpecificOptions.Values['Provider'] := 'prDirect';
 {$ENDIF}
 
   Connection.Connected := True;
